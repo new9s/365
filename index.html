@@ -359,7 +359,7 @@ body{height:auto;min-height:100dvh;margin:0;padding:12px max(8px,env(safe-area-i
 .badge-full .bt,.six-weeks .badge-full .bt{width:12px;flex:none;font-size:10px;text-align:center}
 .badge-full .bl{min-width:0;flex:1;width:auto;padding:2px 0;letter-spacing:0}
 .badge-full .bl.t-vac,.badge-full .bl.t-ot,.badge-full .bl.t-kor{width:auto;min-width:0;padding:2px 0}
-.badge-full .lg{display:none!important}.badge-full .sm{display:inline!important}
+.badge-full .bl .lg{display:inline}.badge-full .bl .sm{display:none}.badge-full .bl.use-sm .lg{display:none}.badge-full .bl.use-sm .sm{display:inline}
 .day-bar{order:5;flex:none;padding:12px;min-width:0}
 .today-box{padding:12px;gap:8px}
 .today-shift .row{padding:3px 0;min-height:27px}
@@ -408,6 +408,59 @@ body{height:auto;min-height:100dvh;margin:0;padding:12px max(8px,env(safe-area-i
 input,textarea,select{font-size:16px}
 button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--mint-dark);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style id="v8-style">
+/* ===== v8: 공가 색 · 라벨 자동 맞춤 · 일일메모 · 스테퍼 ===== */
+.t-gong{display:inline-block;width:4.6em;box-sizing:border-box;text-align:center;white-space:nowrap;line-height:1.15;padding:2px 0;border-radius:4px;color:#fff;background:#d97706}
+.shift-label.t-gong{width:100%;max-width:100%;padding:4px 0;white-space:nowrap;border-radius:5px}
+.badge-full .bl.t-gong{width:auto;min-width:0;padding:2px 0}
+.chip.b-gong{background:#d97706;color:#fff;border:none}
+/* 전체 조 칸: 라벨을 칸 폭에 맞춰 줄이고, 그래도 안 들어가면 한 글자 약칭 */
+.cal-cell.multi{padding:2px 1px}
+.cal-cell.multi .date-num{margin-left:2px}
+.badge-full{gap:1px}
+.badge-full .bt,.six-weeks .badge-full .bt{width:9px;font-size:9px}
+.badge-full .bl{flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:clip;text-align:center;letter-spacing:-.6px}
+.badge-full .bl.t-vac,.badge-full .bl.t-ot,.badge-full .bl.t-kor,.badge-full .bl.t-gong{min-width:0;flex:1 1 0}
+@media(min-width:420px){.badge-full .bt,.six-weeks .badge-full .bt{width:12px;font-size:10px}.badge-full{gap:2px}}
+.shift-label{white-space:nowrap;overflow:hidden}
+.shift-label .fit{display:inline-block;white-space:nowrap}
+.cal-cell{overflow:hidden}
+.day-main{justify-content:flex-start}
+.day-meta{width:100%;font-size:9px;line-height:1.25;text-align:center;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-all;margin-top:-2px}
+.m-ot{color:#ea580c;font-weight:900}
+.m-out{color:#2563eb;font-weight:900}
+.split-box{display:flex;flex-direction:column;gap:4px;background:var(--sub-bg);border-radius:12px;padding:8px 10px}
+.split-box .sp-title{font-size:12px;font-weight:900;color:var(--mint-dark)}
+.modal-box .split-box button.sp-opt{min-height:40px;padding:6px 10px;font-size:13px;background:#fff;border:2px solid var(--border);color:var(--text)}
+.modal-box .split-box button.sp-opt.on{border-color:var(--accent);background:var(--accent2);color:var(--mint-dark)}
+.m-text{color:#475569;font-weight:700}
+/* 근무 변경 창 */
+.memo-box{display:flex;flex-direction:column;gap:5px;background:var(--sub-bg);border-radius:12px;padding:10px;margin-bottom:6px}
+.memo-box .memo-label{font-size:12px;font-weight:900;color:var(--mint-dark)}
+.memo-row{display:flex;gap:6px;align-items:stretch}
+.memo-row textarea{flex:1 1 auto;min-width:0;min-height:56px;resize:none;text-align:left;font-weight:700;font-family:inherit;line-height:1.4;padding:8px;border:1px solid #94a3b8;border-radius:8px;background:#fff;color:var(--text)}
+.modal-box .memo-row button{width:auto;flex:0 0 auto;white-space:nowrap;text-align:center;background:var(--accent);color:#fff;border:none;padding:0 14px}
+.memo-view{font-size:14px;font-weight:700;color:var(--text);line-height:1.5;overflow-wrap:anywhere}
+.memo-status,.modal-status{font-size:12px;color:var(--text-muted);line-height:1.5;min-height:0}
+.modal-status:empty,.memo-status:empty{display:none}
+.modal-status{text-align:center;color:var(--mint-dark);font-weight:700;margin-bottom:4px}
+.stepper-row{display:flex;flex-direction:column;gap:4px;background:var(--sub-bg);border-radius:12px;padding:8px 10px}
+.stepper-row .st-name{font-size:13px;font-weight:900}
+.stepper-row .st-ctl{display:flex;align-items:center;gap:6px}
+.stepper-row .st-val{flex:1 1 auto;min-width:64px;text-align:center;font-size:17px;font-weight:900}
+.modal-box .stepper-row button{width:auto;min-width:40px;min-height:40px;text-align:center;padding:0 10px}
+.modal-box .stepper-row .st-btn{width:44px;font-size:22px;line-height:1;padding:0;background:#fff;border:1px solid var(--border)}
+.modal-box .stepper-row .st-apply{background:var(--accent);color:#fff;border:none;min-width:64px}
+.modal-box .stepper-row button:disabled{opacity:.4;cursor:not-allowed}
+.stepper-row.off{opacity:.8}
+.stepper-row .st-note{font-size:12px;color:var(--text-muted);line-height:1.5}
+/* 근무 산출식 */
+.pay-box{border-top:1px solid var(--border);margin-top:10px;padding-top:8px;text-align:left}
+.pay-box h4{margin:0 0 6px;font-size:14px}
+.pay-line{font-size:13px;line-height:1.7}
+.pay-total{font-size:14px;font-weight:900;margin-top:4px}
+.pay-small{font-size:11px;color:var(--text-muted);line-height:1.6;margin-top:4px}
 </style>
 </head>
 <body>
@@ -491,6 +544,8 @@ button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-vis
     <div class="modal-box">
       <div id="modalTitle" class="modal-title">근무 변경</div>
       <div id="modalInfo" class="modal-info"></div>
+      <div id="modalStatus" class="modal-status"></div>
+      <div id="modalMemo" class="memo-box"></div>
       <div id="modalBtns" style="display:flex;flex-direction:column;gap:6px;"></div>
       <button class="close-btn" onclick="closeModal()">닫기</button>
     </div>
@@ -523,11 +578,15 @@ var CAL = (function () {
 
   // ===== 시간 산정 규칙 =====
   var SHIFT_H = 8;      // 기본 근무
-  var OT_H = 4;         // 대근·조기출근·코로마 잔업
-  var LEAVE_H = 8;      // 휴가(연차) 산정 시간
-  var EARLY_OUT_H = 4;  // 조퇴 시 근무 시간
+  var OT_H = 4;         // 대근·조출·코로마 잔업
+  var LEAVE_H = 8;      // 휴가·공가 산정 시간
+  var OT_MIN = 0.5, OT_MAX = 12, OT_STEP = 0.5, OT_DEFAULT = 4;     // 잔업 스테퍼(OT:n)
+  var EARLY_MIN = 1, EARLY_MAX = 7, EARLY_DEFAULT = 4;               // 조퇴 스테퍼(EARLY_*:n)
   var WARN_DAYS = 14, WARN_LIMIT = 104;   // 지난 2주 평균 주 52h 이상 안내
   var LIMIT_DAYS = 21, LIMIT_HOURS = 156; // 3주 평균 주 52h
+  // 야간근로(22:00~06:00) 시간 가정: 조간 06:30 시작 0, 주간 14:30~22:30 중 22:00~22:30 0.5, 야간 22:30~06:30 중 22:30~06:00 7.5
+  var NIGHT_H = { '조간': 0, '주간': 0.5, '야간': 7.5 };
+  var UNSUPPORTED = ['명절근로수당', '토요근로(43)', '일요근로(43)', '보전수당'];
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function key(y, m, d) { return y + '-' + pad(m) + '-' + pad(d); }
@@ -548,57 +607,134 @@ var CAL = (function () {
     var md = pad(m) + '-' + pad(d);
     return FIXED_HOLIDAYS.indexOf(md) >= 0 || LUNAR_HOLIDAYS.indexOf(y + '-' + md) >= 0;
   }
-  function mk(txt, cls, otH, hrs, code) { return { txt: txt, cls: cls, otH: otH, hrs: hrs, code: code }; }
+  function fmtH(n) { return String(Math.round(Number(n) * 100) / 100); }
+
+  // ===== 오버라이드 값 해석 =====
+  var LEGACY = { OT1: '조간2교', OT2: '야간2교', EARLY_DAY_IN: '주간조출', EARLY_NIGHT_IN: '야간조출' };
+  // → { kind, n, split }. kind: '' | VAC | GONGGA | KOROMA | EARLY_MORN | EARLY_DAY | EARLY_NIGHT | FORCE | OT | LEGACY | UNKNOWN
+  // split: 결원(VAC/GONGGA/KOROMA)의 2교대 분담 접미사 ''(4h·4h) / 'J'(조간2교 16h) / 'Y'(야간2교 16h)
+  function pv_(kind, n, split) { return { kind: kind, n: n, split: split || '' }; }
+  function parseVal(v) {
+    if (v === null || v === undefined) return pv_('', 0);
+    var s = String(v), m;
+    if (s === '' || s === 'RESET') return pv_('', 0);
+    m = /^(VAC|GONGGA|KOROMA)(?::([JY]))?$/.exec(s);
+    if (m) return pv_(m[1], 0, m[2]);
+    if (/^[1-4]$/.test(s)) return pv_('FORCE', Number(s));
+    if (Object.prototype.hasOwnProperty.call(LEGACY, s)) return pv_('LEGACY', 0);
+    m = /^(EARLY_MORN|EARLY_DAY|EARLY_NIGHT)(?::([1-7]))?$/.exec(s);
+    if (m) return pv_(m[1], m[2] ? Number(m[2]) : EARLY_DEFAULT);
+    m = /^OT:(\d{1,2}(?:\.5)?)$/.exec(s);
+    if (m && Number(m[1]) >= OT_MIN && Number(m[1]) <= OT_MAX) return pv_('OT', Number(m[1]));
+    return pv_('UNKNOWN', 0);
+  }
+  // 이력·새 소식용 한국어 라벨
+  function valueLabel(v) {
+    var p = parseVal(v), s = String(v === null || v === undefined ? '' : v);
+    switch (p.kind) {
+      case '': return '기본 근무';
+      case 'VAC': case 'GONGGA': case 'KOROMA':
+        return ({ VAC: '휴가', GONGGA: '공가', KOROMA: '코로마' })[p.kind] + (p.split === 'J' ? ' (조간2교 16h)' : p.split === 'Y' ? ' (야간2교 16h)' : '');
+      case 'EARLY_MORN': return '조간조퇴 ' + p.n + '시간';
+      case 'EARLY_DAY': return '주간조퇴 ' + p.n + '시간';
+      case 'EARLY_NIGHT': return '야간조퇴 ' + p.n + '시간';
+      case 'OT': return '잔업 ' + fmtH(p.n) + '시간';
+      case 'FORCE': return NAMES[p.n] + ' 지정';
+      case 'LEGACY': return LEGACY[s];
+      default: return s;
+    }
+  }
+
+  function mk(txt, cls, otH, hrs, code) { return { txt: txt, cls: cls, otH: otH, hrs: hrs, code: code, outH: 0 }; }
+
+  // 조퇴자가 d일에 조퇴할 때 조출을 받는 후속조: 조간→같은 날 주간조, 주간→같은 날 야간조, 야간→다음 날 조간조. 휴무면 null.
+  function earlyFollower(team, y, m, d) {
+    var b = baseShift(team, y, m, d);
+    if (b < 1 || b > 3) return null;
+    var f = b === 3 ? fromAbs(abs(y, m, d) + 1) : { y: y, m: m, d: d }, want = b === 3 ? 1 : b + 1;
+    for (var i = 0; i < TEAMS.length; i++) {
+      var t = TEAMS[i];
+      if (t !== team && baseShift(t, f.y, f.m, f.d) === want) return { team: t, y: f.y, m: f.m, d: f.d, shift: NAMES[want] };
+    }
+    return null;
+  }
 
   // ovr: 한 공정의 { 'YYYY-MM-DD': { A: 값, ... } }
+  // 반환: 조별 { txt, cls, otH, hrs, code, shift }  (shift = 실제 근무한 교대 1·2·3, 휴무 4)
   function dayStatus(ovr, y, m, d) {
     var k = key(y, m, d);
     var base = {};
     TEAMS.forEach(function (t) { base[t] = baseShift(t, y, m, d); });
-    var disp = {};
+    var disp = {}, pv = {};
+    var dayOvr = (ovr && ovr[k]) || {};
     TEAMS.forEach(function (t) {
       var b = base[t];
       disp[t] = mk(NAMES[b], 'shift-base', 0, b === 4 ? 0 : SHIFT_H, 'BASE');
+      pv[t] = parseVal(dayOvr[t]);
     });
-    var dayOvr = (ovr && ovr[k]) || {};
-    var absTeam = TEAMS.filter(function (t) { return dayOvr[t] === 'VAC' || dayOvr[t] === 'KOROMA'; })[0];
-    var eMorn = TEAMS.filter(function (t) { return dayOvr[t] === 'EARLY_MORN'; })[0];
-    var eDay = TEAMS.filter(function (t) { return dayOvr[t] === 'EARLY_DAY'; })[0];
     function find(role, except) { return TEAMS.filter(function (t) { return t !== except && base[t] === role; })[0]; }
-    function cover(t, txt) { if (t && !dayOvr[t]) disp[t] = mk(txt, 'b-ot', OT_H, SHIFT_H + OT_H, 'COVER'); }
+    function isAbs(t) { return pv[t].kind === 'VAC' || pv[t].kind === 'GONGGA' || pv[t].kind === 'KOROMA'; }
+    // 1명 결원의 2교대 분담. which: 'M' 조간2교 / 'Y' 야간2교, sp: ''(4h·4h) | 'J' | 'Y'
+    function cover(t, which, sp) {
+      if (!t || dayOvr[t]) return;
+      var nm = which === 'M' ? '조간2교' : '야간2교';
+      if (!sp) disp[t] = mk(nm, 'b-ot', OT_H, SHIFT_H + OT_H, 'COVER');
+      else if ((sp === 'J') === (which === 'M')) disp[t] = mk(nm + fmtH(SHIFT_H * 2) + 'h', 'b-ot', SHIFT_H, SHIFT_H * 2, 'COVER');
+      else disp[t] = mk(nm + fmtH(SHIFT_H) + 'h', 'b-ot', 0, SHIFT_H, 'COVER');
+    }
 
-    // 휴가·코로마: 같은 공정 나머지 두 조가 4h씩 대근 (V1.4 규칙)
-    if (absTeam) {
-      disp[absTeam] = dayOvr[absTeam] === 'VAC'
-        ? mk('휴가', 'b-vac', 0, LEAVE_H, 'VAC')
-        : mk('코로마', 'b-kor', OT_H, SHIFT_H + OT_H, 'KOROMA');
-      var role = base[absTeam];
-      var mT = find(1, absTeam), dT = find(2, absTeam), nT = find(3, absTeam);
-      if (role === 3) { cover(dT, '주간대근'); cover(mT, '야간대근'); }
-      else if (role === 1) { cover(dT, '주간대근'); cover(nT, '야간대근'); }
-      else if (role === 2) { cover(mT, '주간대근'); cover(nT, '야간대근'); }
-    }
-    if (eMorn && base[eMorn] === 1) {
-      disp[eMorn] = mk('조간조퇴', 'b-early', 0, EARLY_OUT_H, 'EARLY');
-      var d1 = find(2, eMorn);
-      if (d1 && !dayOvr[d1]) disp[d1] = mk('주간조기', 'b-ot', OT_H, SHIFT_H + OT_H, 'COVER');
-    }
-    if (eDay && base[eDay] === 2) {
-      disp[eDay] = mk('주간조퇴', 'b-early', 0, EARLY_OUT_H, 'EARLY');
-      var n1 = find(3, eDay);
-      if (n1 && !dayOvr[n1]) disp[n1] = mk('야간조기', 'b-ot', OT_H, SHIFT_H + OT_H, 'COVER');
-    }
+    // 결원(휴가·공가·코로마): 기본 근무일의 팀만 대근을 만든다
+    var absTeams = TEAMS.filter(function (t) { return isAbs(t) && base[t] !== 4; });
     TEAMS.forEach(function (t) {
-      var v = dayOvr[t];
-      if (v && v !== 'VAC' && v !== 'KOROMA' && v !== 'EARLY_MORN' && v !== 'EARLY_DAY') {
-        var n = Number(v);
-        if (n >= 1 && n <= 4) disp[t] = mk(NAMES[n], 'shift-base', 0, n === 4 ? 0 : SHIFT_H, 'FORCE');
-        else if (v === 'OT1') disp[t] = mk('주간대근', 'b-ot', OT_H, SHIFT_H + OT_H, 'MANUAL');
-        else if (v === 'OT2') disp[t] = mk('야간대근', 'b-ot', OT_H, SHIFT_H + OT_H, 'MANUAL');
-        else if (v === 'EARLY_DAY_IN') disp[t] = mk('주간조기', 'b-ot', OT_H, SHIFT_H + OT_H, 'MANUAL');
-        else if (v === 'EARLY_NIGHT_IN') disp[t] = mk('야간조기', 'b-ot', OT_H, SHIFT_H + OT_H, 'MANUAL');
-      }
+      var kd = pv[t].kind;
+      if (kd === 'VAC') disp[t] = mk('휴가', 'b-vac', 0, LEAVE_H, 'VAC');
+      else if (kd === 'GONGGA') disp[t] = mk('공가', 'b-gong', 0, LEAVE_H, 'GONG');
+      else if (kd === 'KOROMA') disp[t] = mk('코로마', 'b-kor', OT_H, SHIFT_H + OT_H, 'KOROMA');
+    });
+    if (absTeams.length === 1) {
+      var role = base[absTeams[0]], sp = pv[absTeams[0]].split;
+      var mT = find(1, absTeams[0]), dT = find(2, absTeams[0]), nT = find(3, absTeams[0]);
+      if (role === 3) { cover(dT, 'M', sp); cover(mT, 'Y', sp); }
+      else if (role === 1) { cover(dT, 'M', sp); cover(nT, 'Y', sp); }
+      else if (role === 2) { cover(mT, 'M', sp); cover(nT, 'Y', sp); }
+    } else if (absTeams.length >= 2) {
+      // 2명 결원: 남은 근무조는 2교, 휴무조는 전부 잔업 12h
+      TEAMS.forEach(function (t) {
+        if (isAbs(t) || dayOvr[t]) return;
+        if (base[t] === 4) disp[t] = mk('휴무2교', 'b-ot', SHIFT_H + OT_H, SHIFT_H + OT_H, 'COVER');
+        else disp[t] = mk(NAMES[base[t]] + '2교', 'b-ot', OT_H, SHIFT_H + OT_H, 'COVER');
+      });
+    }
+    // 조퇴 n시간: 조퇴자 8-n h, 후속조 조출 +n h (조간→주간조, 주간→야간조는 같은 날, 야간→다음 날 조간조)
+    function earlyOut(et, role, n) {
+      disp[et] = mk(NAMES[role] + '조퇴', 'b-early', 0, SHIFT_H - n, 'EARLY');
+      disp[et].outH = n;
+    }
+    function giveOut(nx, n, txt) {
+      if (!nx || dayOvr[nx]) return;
+      disp[nx] = mk(txt, 'b-ot', n, SHIFT_H + n, 'COVER');   // 같은 날 결원 대근 라벨이 있어도 조출이 덮어쓴다(누적 안 함)
+    }
+    [['EARLY_MORN', 1, '주간조출'], ['EARLY_DAY', 2, '야간조출'], ['EARLY_NIGHT', 3, '']].forEach(function (e) {
+      var et = TEAMS.filter(function (t) { return pv[t].kind === e[0] && base[t] === e[1]; })[0];
+      if (!et) return;
+      earlyOut(et, e[1], pv[et].n);
+      if (e[1] < 3) giveOut(find(e[1] + 1, et), pv[et].n, e[2]);
+    });
+    // 전날 야간조퇴의 후속조: 오늘의 조간 조가 조출
+    var yf = fromAbs(abs(y, m, d) - 1), yOvr = (ovr && ovr[key(yf.y, yf.m, yf.d)]) || {};
+    TEAMS.forEach(function (t) {
+      var q = parseVal(yOvr[t]);
+      if (q.kind !== 'EARLY_NIGHT' || baseShift(t, yf.y, yf.m, yf.d) !== 3) return;
+      var fo = earlyFollower(t, yf.y, yf.m, yf.d);
+      if (fo && fo.y === y && fo.m === m && fo.d === d) giveOut(fo.team, q.n, '조간조출');
+    });
+    TEAMS.forEach(function (t) {
+      var p = pv[t], b = base[t];
+      if (p.kind === 'FORCE') disp[t] = mk(NAMES[p.n], 'shift-base', 0, p.n === 4 ? 0 : SHIFT_H, 'FORCE');
+      else if (p.kind === 'OT') disp[t] = mk('잔업' + fmtH(p.n) + 'h', 'b-ot', p.n, (b === 4 ? 0 : SHIFT_H) + p.n, 'MANUAL');
+      else if (p.kind === 'LEGACY') disp[t] = mk(LEGACY[String(dayOvr[t])], 'b-ot', OT_H, SHIFT_H + OT_H, 'MANUAL');
       if (disp[t].txt === '휴무') disp[t].cls += ' off-text';
+      disp[t].shift = p.kind === 'FORCE' ? p.n : b;
     });
     return disp;
   }
@@ -609,32 +745,99 @@ var CAL = (function () {
     for (var a = e - days + 1; a <= e; a++) { var f = fromAbs(a); s += dayStatus(ovr, f.y, f.m, f.d)[team].hrs; }
     return s;
   }
-  // 잔업 집계: 전월 16일 ~ 당월 15일 (V1.4)
+  // 잔업 집계 기간: 전월 16일 ~ 당월 15일 (V1.4)
+  function periodOf(y, m) {
+    var py = m === 1 ? y - 1 : y, pm = m === 1 ? 12 : m - 1;
+    return { from: abs(py, pm, 16), to: abs(y, m, 15), fy: py, fm: pm };
+  }
   function otPeriod(ovr, team, y, m) {
-    var py = m === 1 ? y - 1 : y, pm = m === 1 ? 12 : m - 1, s = 0, d;
-    for (d = 16; d <= daysInMonth(py, pm); d++) s += dayStatus(ovr, py, pm, d)[team].otH;
-    for (d = 1; d <= 15; d++) s += dayStatus(ovr, y, m, d)[team].otH;
+    var p = periodOf(y, m), s = 0;
+    for (var a = p.from; a <= p.to; a++) { var f = fromAbs(a); s += dayStatus(ovr, f.y, f.m, f.d)[team].otH; }
     return s;
   }
-  // 연차 사용일수 (해당 연도, 지난 날짜 포함 소급)
+  // 연차 사용일수 (해당 연도, 지난 날짜 포함 소급). 공휴일의 휴가는 연차를 쓰지 않는다.
   function vacCount(ovr, team, y) {
     var c = 0, pre = y + '-';
-    for (var k in ovr) if (k.indexOf(pre) === 0 && ovr[k][team] === 'VAC') c++;
+    for (var k in ovr) {
+      if (k.indexOf(pre) !== 0 || parseVal(ovr[k][team]).kind !== 'VAC') continue;
+      var p = parseKey(k);
+      if (!isHoliday(p.y, p.m, p.d)) c++;
+    }
     return c;
   }
+  // 공가 일수(연차와 별개 통계)
+  function gongCount(ovr, team, y) {
+    var c = 0, pre = y + '-';
+    for (var k in ovr) if (k.indexOf(pre) === 0 && parseVal(ovr[k][team]).kind === 'GONGGA') c++;
+    return c;
+  }
+  // 결원(휴가·공가·코로마) 추가 검증: 통과면 '', 막히면 한국어 메시지. 서버와 화면이 같이 쓴다.
+  function canAddAbsence(ovr, team, val, y, m, d) {
+    var kd = parseVal(val).kind;
+    if (kd !== 'VAC' && kd !== 'GONGGA' && kd !== 'KOROMA') return '';
+    if (baseShift(team, y, m, d) === 4) return kd === 'GONGGA' ? '휴무일에는 공가를 넣을 수 없어요' : '휴무일에는 휴가나 코로마를 넣을 수 없어요';
+    var day = (ovr && ovr[key(y, m, d)]) || {}, names = { VAC: '휴가', GONGGA: '공가', KOROMA: '코로마' };
+    var others = TEAMS.filter(function (t) { var o = parseVal(day[t]).kind; return t !== team && names[o]; });
+    if (!others.length) return '';
+    var first = others[0], fk = parseVal(day[first]).kind;
+    if (kd === 'KOROMA' || fk === 'KOROMA') return '그날은 이미 ' + first + '조가 ' + names[fk] + '로 빠져 있어요';
+    if (others.length >= 2) return '그날은 이미 2개 조가 빠져 있어요(최대 2개 조)';
+    return '';
+  }
+
+  // ===== 잔업계산 · 근무산출식 (docs/계산방법.md) =====
+  function r2(n) { return Math.round(n * 100) / 100; }
+  // 전월16일~당월15일의 환산시간(통상시급 × 환산시간 = 수당). 휴가·공가·휴무는 제외.
+  function payBreakdown(ovr, team, y, m) {
+    var p = periodOf(y, m), f, a;
+    var acc = { ext: 0, sun_base: 0, sun_ot: 0, hol_base: 0, hol_ot: 0, night: 0 }, otHours = 0;
+    for (a = p.from; a <= p.to; a++) {
+      f = fromAbs(a);
+      var st = dayStatus(ovr, f.y, f.m, f.d)[team];
+      otHours += st.otH;
+      if (st.code === 'VAC' || st.code === 'GONG' || !(st.hrs > 0)) continue;
+      var ot = st.otH, bs = st.hrs - st.otH;
+      if (isHoliday(f.y, f.m, f.d)) { acc.hol_base += bs; acc.hol_ot += ot; }
+      else if (f.dow === 0) { acc.sun_base += bs; acc.sun_ot += ot; }
+      else acc.ext += ot;
+      // 조간·주간 조퇴일은 0, 야간조퇴일은 야간시간을 근무시간 비례(hrs/8)로 계산(가정)
+      if (st.code !== 'EARLY') acc.night += NIGHT_H[NAMES[st.shift]] || 0;
+      else if (st.shift === 3) acc.night += (NIGHT_H['야간'] || 0) * st.hrs / SHIFT_H;
+    }
+    var defs = [
+      ['ext', '연장근로', 1.5], ['sun_base', '일요일 기본근로', 1.7], ['sun_ot', '일요일 초과근로', 2.2],
+      ['hol_base', '공휴일 기본근로', 1.5], ['hol_ot', '공휴일 초과근로', 2.0], ['night', '야간근로', 0.5]
+    ];
+    var lines = [], total = 0;
+    defs.forEach(function (df) {
+      var h = r2(acc[df[0]]);
+      if (!(h > 0)) return;
+      var w = r2(h * df[2]);
+      total += w;
+      lines.push({ key: df[0], label: df[1], hours: h, rate: df[2], weighted: w,
+        eq: df[1] + ' ' + fmtH(h) + 'h × ' + Math.round(df[2] * 100) + '% = ' + fmtH(w) + 'h' });
+    });
+    return { from: key(p.fy, p.fm, 16), to: key(y, m, 15), otHours: otHours, lines: lines, total: r2(total), unsupported: UNSUPPORTED.slice() };
+  }
+
   function shortTxt(txt) {
     if (txt.indexOf('휴가') >= 0) return '가';
+    if (txt.indexOf('공가') >= 0) return '공';
     if (txt.indexOf('코로마') >= 0) return '코';
-    if (txt.indexOf('대근') >= 0) return '대';
-    if (txt.indexOf('조기') >= 0) return '기';
+    if (txt.indexOf('2교') >= 0) return '교';
+    if (txt.indexOf('조출') >= 0) return '출';
     if (txt.indexOf('조퇴') >= 0) return '퇴';
+    if (txt.indexOf('잔업') >= 0) return '잔';
     return txt.charAt(0);
   }
 
   return {
     TEAMS: TEAMS, NAMES: NAMES, key: key, abs: abs, fromAbs: fromAbs, parseKey: parseKey,
     daysInMonth: daysInMonth, baseShift: baseShift, isHoliday: isHoliday, dayStatus: dayStatus,
-    sumHours: sumHours, otPeriod: otPeriod, vacCount: vacCount, shortTxt: shortTxt,
+    sumHours: sumHours, otPeriod: otPeriod, vacCount: vacCount, gongCount: gongCount, shortTxt: shortTxt,
+    parseVal: parseVal, earlyFollower: earlyFollower, valueLabel: valueLabel, canAddAbsence: canAddAbsence, fmtH: fmtH, payBreakdown: payBreakdown,
+    OT_MIN: OT_MIN, OT_MAX: OT_MAX, OT_STEP: OT_STEP, OT_DEFAULT: OT_DEFAULT,
+    EARLY_MIN: EARLY_MIN, EARLY_MAX: EARLY_MAX, EARLY_DEFAULT: EARLY_DEFAULT, NIGHT_H: NIGHT_H,
     WARN_DAYS: WARN_DAYS, WARN_LIMIT: WARN_LIMIT, LIMIT_DAYS: LIMIT_DAYS, LIMIT_HOURS: LIMIT_HOURS
   };
 })();
@@ -743,7 +946,7 @@ var CAL = (function () {
         if (TOKEN !== session || !session) return false;
         if (background && (refreshBlocked() || revision !== dataRevision)) return false;
         BOOT = teamOnlyBoot(next); lastLoad = Date.now();
-        if (!curProc) curProc = BOOT.isAdmin ? 'ALL' : String(BOOT.me.process);
+        if (!curProc) curProc = (BOOT.isAdmin || BOOT.isForeman) ? 'ALL' : String(BOOT.me.process);
         if (initial) { viewTeam = BOOT.isAdmin ? 'ALL' : BOOT.me.team; summaryTeam = BOOT.isAdmin ? 'A' : BOOT.me.team; }
         firstView = false;
         const manager = BOOT.isAdmin || BOOT.isForeman;
@@ -751,7 +954,7 @@ var CAL = (function () {
         document.querySelectorAll('#adminRow .admin-only').forEach(b => { b.style.display = BOOT.isAdmin ? '' : 'none'; });
         $('procSel').style.display = manager ? '' : 'none';
         if (manager) {
-          $('procSel').innerHTML = (BOOT.isAdmin ? '<option value="ALL">통합</option>' : '') + BOOT.processes.map(p => '<option value="' + esc(p.process) + '">' + esc(p.name) + '</option>').join('');
+          $('procSel').innerHTML = ((BOOT.isAdmin || BOOT.isForeman) ? '<option value="ALL">통합</option>' : '') + BOOT.processes.map(p => '<option value="' + esc(p.process) + '">' + esc(p.name) + '</option>').join('');
           $('procSel').value = curProc;
         }
         render(); setStatus('ok');
@@ -816,12 +1019,17 @@ var CAL = (function () {
     }
     function gotoProc(p, t) { if (!BOOT.isAdmin) return; curProc = String(p); viewTeam = 'ALL'; summaryTeam = t; $('procSel').value = curProc; render(); }
     function gotoToday() { const td = todayP(); currentYear = td.y; currentMonth = td.m; render(); }
-    function showTxt(t) { t = String(t); return t === '휴무' ? 'ㅡㅡ' : t.replace('주간대근', '조간대근'); }
+    function showTxt(t) { t = String(t); return t === '휴무' ? 'ㅡㅡ' : t; }
+    const lbl = v => (v === '' || v == null) ? '기본' : CAL.valueLabel(v);
+    const kindOf = v => (v === '' || v == null) ? '' : CAL.parseVal(v).kind;
+    const splitOf = v => (v === '' || v == null) ? '' : (CAL.parseVal(v).split || '');
+    const isAbsent = c => c === 'VAC' || c === 'GONG' || c === 'KOROMA';
     function textCls(s) {
       if (s.code === 'VAC') return 't-vac';
+      if (s.code === 'GONG') return 't-gong';
       if (s.code === 'KOROMA') return 't-kor';
       if (s.code === 'EARLY') return 't-early';
-      if (s.otH > 0) return 't-ot';
+      if (s.code === 'COVER' || s.otH > 0) return 't-ot';
       if (s.txt === '휴무') return 't-off';
       if (s.txt === '조간') return 't-morn';
       if (s.txt === '주간') return 't-day';
@@ -837,7 +1045,7 @@ var CAL = (function () {
       $('bigMonthLabel').innerHTML = `${currentYear}<span>년</span>${currentMonth}<span>월</span>`;
       const me = BOOT.me;
       $('whoLabel').innerText = BOOT.isAdmin ? '관리자 · ' + (curProc === 'ALL' ? '통합 보기' : procName(curProc))
-        : BOOT.isForeman ? `${me.team}조 직장 · ${procName(curProc)}`
+        : BOOT.isForeman ? `${me.team}조 직장 · ${curProc === 'ALL' ? '통합 보기' : procName(curProc)}`
         : `${procName(me.process)} · ${me.team}조`;
       const isAll = curProc === 'ALL';
       if (BOOT.isAdmin || BOOT.isForeman) $('procSel').value = curProc;
@@ -861,7 +1069,7 @@ var CAL = (function () {
       if (curProc === 'ALL') {
         const count = (y, m, d) => {
           const names = [];
-          BOOT.processes.forEach(pr => { const ds = CAL.dayStatus(ovrOf(pr.process), y, m, d); CAL.TEAMS.forEach(t => { if (ds[t].code === 'VAC' || ds[t].code === 'KOROMA') names.push(esc(pr.name) + ' ' + t + '조 ' + ds[t].txt); }); });
+          BOOT.processes.forEach(pr => { const ds = CAL.dayStatus(ovrOf(pr.process), y, m, d); CAL.TEAMS.forEach(t => { if (isAbsent(ds[t].code)) names.push(esc(pr.name) + ' ' + t + '조 ' + ds[t].txt); }); });
           return names.length ? names.join(', ') : '없음';
         };
         $('dayBar').innerHTML = '<div class="today-top"><div class="today-heading">오늘·내일 결원</div>' + todayButton + '</div>오늘 ' + md(td.y, td.m, td.d) + ' 빠짐: ' + count(td.y, td.m, td.d) + '<br>내일 ' + md(tm.y, tm.m, tm.d) + ' 빠짐: ' + count(tm.y, tm.m, tm.d);
@@ -892,22 +1100,59 @@ var CAL = (function () {
         const dayColor = (dow === 0 || isHol) ? 'sun' : (dow === 6 ? 'sat' : '');
         const isToday = currentYear === td.y && currentMonth === td.m && d === td.d;
         const personal = curProc !== 'ALL' && viewTeam !== 'ALL';
-        html += `<div class="cal-cell${isToday ? ' today-cell' : ''}">${personal ? '' : '<div class="date-num ' + dayColor + '">' + d + '</div>'}${cellFn(d, key, dayColor)}</div>`;
+        const multi = curProc !== 'ALL' && viewTeam === 'ALL';
+        html += `<div class="cal-cell${isToday ? ' today-cell' : ''}${multi ? ' multi' : ''}">${personal ? '' : '<div class="date-num ' + dayColor + '">' + d + '</div>'}${cellFn(d, key, dayColor)}</div>`;
       }
       $('calGrid').innerHTML = html;
       $('calGrid').style.gridTemplateRows = `repeat(${Math.ceil((firstDow + lastDay) / 7)}, 1fr)`;
       $('calGrid').classList.toggle('six-weeks', (firstDow + lastDay) > 35);
+      fitLabels();
     }
+    // 칸 안에 라벨이 다 보이도록 글씨를 줄이고, 그래도 안 들어가면 한 글자 약칭으로 바꾼다.
+    const FIT_MIN = 8;
+    function fitLabels() {
+      const grid = $('calGrid'); if (!grid || !grid.offsetWidth) return;
+      grid.querySelectorAll('.bl').forEach(bl => {
+        bl.classList.remove('use-sm'); bl.style.fontSize = '';
+        const lg = bl.querySelector('.lg'); if (!lg) return;
+        let fs = parseFloat(getComputedStyle(bl).fontSize), avail = bl.clientWidth, w = lg.getBoundingClientRect().width;
+        if (w <= avail + 0.01) return;
+        fs = Math.floor(fs * avail / w * 10) / 10;
+        for (let i = 0; i < 6 && fs >= FIT_MIN; i++) {
+          bl.style.fontSize = fs + 'px';
+          if (lg.getBoundingClientRect().width <= bl.clientWidth + 0.01) return;
+          fs = Math.floor((fs - 0.3) * 10) / 10;
+        }
+        bl.style.fontSize = ''; bl.classList.add('use-sm');
+      });
+      grid.querySelectorAll('.shift-label').forEach(sl => {
+        const f = sl.querySelector('.fit'); if (!f) return;
+        sl.style.fontSize = '';
+        let fs = parseFloat(getComputedStyle(sl).fontSize), avail = sl.clientWidth, w = f.getBoundingClientRect().width;
+        if (w <= avail + 0.01) return;
+        fs = Math.max(6, Math.floor(fs * avail / w * 10) / 10);
+        for (let i = 0; i < 8; i++) {
+          sl.style.fontSize = fs + 'px';
+          if (f.getBoundingClientRect().width <= sl.clientWidth + 0.01 || fs <= 6) return;
+          fs = Math.max(6, Math.floor((fs - 0.3) * 10) / 10);
+        }
+      });
+    }
+    let fitTimer = 0;
+    window.addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitLabels, 80); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitLabels());
     function renderProcCal() {
       const o = ovrOf(curProc);
       calFrame((d, key, dayColor) => {
         const disp = CAL.dayStatus(o, currentYear, currentMonth, d);
         if (viewTeam === 'ALL') {
           return `<div class="all-badges-wrap">` + CAL.TEAMS.map(t =>
-            `<div class="badge-full" onclick="openModal('${key}','${t}')"><span class="bt"><span class="lg">${t}조</span><span class="sm">${t}</span></span><span class="bl ${textCls(disp[t])}"><span class="lg">${esc(showTxt(disp[t].txt))}</span><span class="sm">${esc(CAL.shortTxt(disp[t].txt))}</span></span></div>`).join('') + `</div>`;
+            `<div class="badge-full" onclick="openModal('${key}','${t}')"><span class="bt"><span class="lg">${t}조</span><span class="sm">${t}</span></span><span class="bl ${textCls(disp[t])}" title="${esc(showTxt(disp[t].txt))}"><span class="lg">${esc(showTxt(disp[t].txt))}</span><span class="sm">${esc(CAL.shortTxt(disp[t].txt))}</span></span></div>`).join('') + `</div>`;
         }
-        const m = disp[viewTeam];
-        return `<div class="day-main" onclick="openModal('${key}','${viewTeam}')"><div class="date-big ${dayColor}">${d}</div><div class="shift-label ${textCls(m)}">${esc(showTxt(m.txt))}</div></div>`;
+        const m = disp[viewTeam], memo = memoOf(curProc, key, viewTeam);
+        const hm = (m.outH > 0 ? `<span class="m-out">−${CAL.fmtH(m.outH)}h</span>` : '') + (m.otH > 0 ? `<span class="m-ot">+${CAL.fmtH(m.otH)}h</span>` : '');
+        const meta = hm + (hm && memo ? ' ' : '') + (memo ? `<span class="m-text">${esc(memo)}</span>` : '');
+        return `<div class="day-main" onclick="openModal('${key}','${viewTeam}')"><div class="date-big ${dayColor}">${d}</div><div class="shift-label ${textCls(m)}"><span class="fit">${esc(showTxt(m.txt))}</span></div>${meta ? '<div class="day-meta">' + meta + '</div>' : ''}</div>`;
       });
     }
     function renderAllCal() {
@@ -916,23 +1161,25 @@ var CAL = (function () {
         BOOT.processes.forEach(pr => {
           const ds = CAL.dayStatus(ovrOf(pr.process), currentYear, currentMonth, d);
           CAL.TEAMS.forEach(t => {
-            if (ds[t].code === 'VAC' || ds[t].code === 'KOROMA') {
+            if (BOOT.isForeman && t !== BOOT.me.team) return;
+            if (isAbsent(ds[t].code)) {
               const p = person(pr.process, t);
-              chips += '<div class="chip ' + ds[t].cls + '" data-proc="' + esc(pr.process) + '" data-key="' + key + '" data-team="' + t + '" onclick="adminEdit(this.dataset.proc,this.dataset.key,this.dataset.team)" title="' + esc(pr.name + ' ' + t + '조') + '">' + esc(pr.name) + ' ' + t + '조 ' + ds[t].txt + '</div>';
+              chips += '<div class="chip ' + ds[t].cls + '" data-proc="' + esc(pr.process) + '" data-key="' + key + '" data-team="' + t + '" onclick="' + (BOOT.isForeman ? 'foremanEdit(this.dataset.proc,this.dataset.key)' : 'adminEdit(this.dataset.proc,this.dataset.key,this.dataset.team)') + '" title="' + esc(pr.name + ' ' + t + '조') + '">' + esc(pr.name) + ' ' + t + '조 ' + ds[t].txt + '</div>';
             }
           });
         });
-        return '<button class="day-edit-btn" data-key="' + key + '" aria-label="' + key + ' 전체 근무 수정" onclick="openAdminDay(this.dataset.key)">전체 근무 수정</button><div class="chips">' + chips + '</div>';
+        return (BOOT.isForeman ? '<button class="day-edit-btn" data-key="' + key + '" aria-label="' + key + ' 공정별 근무" onclick="openForemanDay(this.dataset.key)">내 조 공정별 보기</button>' : '<button class="day-edit-btn" data-key="' + key + '" aria-label="' + key + ' 전체 근무 수정" onclick="openAdminDay(this.dataset.key)">전체 근무 수정</button>') + '<div class="chips">' + chips + '</div>';
       });
     }
     function renderSummary() {
       const box = $('summaryTable');
       if (curProc === 'ALL') {
-        let vac = 0, kor = 0;
+        let vac = 0, gong = 0, kor = 0;
         const pre = CAL.key(currentYear, currentMonth, 1).slice(0, 8);
-        BOOT.processes.forEach(pr => { const o = ovrOf(pr.process); for (const k in o) if (k.indexOf(pre) === 0) for (const t in o[k]) { if (o[k][t] === 'VAC') vac++; if (o[k][t] === 'KOROMA') kor++; } });
-        const over = BOOT.people.filter(p => stats(p.process, p.team).over2).length;
-        box.innerHTML = `<div class="sum-all">이번 달 휴가 <b>${vac}건</b> · 코로마 <b>${kor}건</b><br>지난 2주 평균 52시간 이상 <b style="color:var(--off-text)">${over}명</b> / ${BOOT.people.length}명<br><button class="btn-gray" style="width:100%;margin-top:6px;" onclick="showPeople()">조별 근무·연차 현황 보기</button></div>`;
+        BOOT.processes.forEach(pr => { const o = ovrOf(pr.process); for (const k in o) if (k.indexOf(pre) === 0) for (const t in o[k]) { if (BOOT.isForeman && t !== BOOT.me.team) continue; const kd = CAL.parseVal(o[k][t]).kind; if (kd === 'VAC') vac++; else if (kd === 'GONGGA') gong++; else if (kd === 'KOROMA') kor++; } });
+        const scope = BOOT.isForeman ? BOOT.people.filter(p => p.team === BOOT.me.team) : BOOT.people;
+        const over = scope.filter(p => stats(p.process, p.team).over2).length;
+        box.innerHTML = `<div class="sum-all">이번 달 휴가 <b>${vac}건</b> · 공가 <b>${gong}건</b> · 코로마 <b>${kor}건</b><br>지난 2주 평균 52시간 이상 <b style="color:var(--off-text)">${over}명</b> / ${scope.length}명${BOOT.isForeman ? '' : '<br><button class="btn-gray" style="width:100%;margin-top:6px;" onclick="showPeople()">조별 근무·연차 현황 보기</button>'}</div>`;
         return;
       }
       const t = summaryTeam, p = person(curProc, t), s = stats(curProc, t);
@@ -999,6 +1246,66 @@ var CAL = (function () {
       }, 900);
     }
 
+    // ===== 일일메모 =====
+    const MEMO_MAX = 60;
+    const memoOf = (p, key, t) => { const m = BOOT && BOOT.memos, r = m && m[String(p)] && m[String(p)][key]; return (r && r[t]) || ''; };
+    function setMemoLocal(p, key, t, text) {
+      if (!BOOT.memos) BOOT.memos = {};
+      const mp = BOOT.memos[String(p)] || (BOOT.memos[String(p)] = {});
+      if (text) { (mp[key] || (mp[key] = {}))[t] = text; }
+      else if (mp[key]) { delete mp[key][t]; if (!Object.keys(mp[key]).length) delete mp[key]; }
+    }
+    function cleanMemo(s) { return String(s == null ? '' : s).replace(/[\r\n]+/g, ' ').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, MEMO_MAX).trim(); }
+    // 메모 권한: 관리자 전체, 직장은 자기 조(모든 공정), 근무자는 자기 공정의 모든 조
+    function canMemo(p, t) {
+      if (!BOOT) return false;
+      if (BOOT.isAdmin) return true;
+      if (BOOT.isForeman) return t === BOOT.me.team;
+      return String(p) === String(BOOT.me.process);
+    }
+    async function saveMemo() {
+      const key = target.key, team = target.team, proc = String(curProc), inp = $('memoInput');
+      if (!inp) return;
+      const text = cleanMemo(inp.value); inp.value = text;
+      try {
+        const r = await call('apiSetMemo', key, proc, team, text);
+        const saved = (r && typeof r.text === 'string') ? r.text : text;
+        setMemoLocal(proc, key, team, saved);
+        render();
+        const st = $('memoStatus'); if (st) st.textContent = saved ? '메모를 저장했어요' : '메모를 지웠어요';
+      } catch (e) {}
+    }
+
+    // ===== 스테퍼 (조퇴 1~7시간 / 잔업 0.5~12시간) =====
+    const STEPV = { early: 4, ot: 4, earlyAct: '' };
+    const STEPCFG = { early: () => ({ min: CAL.EARLY_MIN, max: CAL.EARLY_MAX, step: 1 }), ot: () => ({ min: CAL.OT_MIN, max: CAL.OT_MAX, step: CAL.OT_STEP }) };
+    function stepInit(kind, cur, kinds) {
+      const c = STEPCFG[kind](), dflt = kind === 'early' ? CAL.EARLY_DEFAULT : CAL.OT_DEFAULT;
+      let v = dflt;
+      if (cur) { const pv = CAL.parseVal(cur); if (kinds.indexOf(pv.kind) >= 0 && isFinite(pv.n) && pv.n != null) v = Number(pv.n); }
+      STEPV[kind] = Math.min(c.max, Math.max(c.min, v));
+    }
+    function stepBy(kind, dir) {
+      const c = STEPCFG[kind]();
+      STEPV[kind] = Math.min(c.max, Math.max(c.min, Math.round((STEPV[kind] + dir * c.step) * 2) / 2));
+      const el = $('stVal_' + kind); if (el) el.textContent = stepText(kind);
+      const dn = $('stDn_' + kind), up = $('stUp_' + kind);
+      if (dn) dn.disabled = STEPV[kind] <= c.min; if (up) up.disabled = STEPV[kind] >= c.max;
+    }
+    const stepText = kind => (kind === 'early' ? '−' : '') + CAL.fmtH(STEPV[kind]) + '시간';
+    function stepApply(kind) {
+      setShift(kind === 'ot' ? 'OT:' + String(STEPV.ot) : STEPV.earlyAct + ':' + String(STEPV.early));
+    }
+    function stepperHtml(kind, title, enabled, note) {
+      const c = STEPCFG[kind](), v = STEPV[kind], on = enabled;
+      return '<div class="stepper-row' + (on ? '' : ' off') + '"><div class="st-name">' + title + '</div><div class="st-ctl">' +
+        '<button type="button" class="st-btn" id="stDn_' + kind + '" aria-label="줄이기" onclick="stepBy(\'' + kind + '\',-1)"' + (on && v > c.min ? '' : ' disabled') + '>−</button>' +
+        '<span class="st-val" id="stVal_' + kind + '">' + stepText(kind) + '</span>' +
+        '<button type="button" class="st-btn" id="stUp_' + kind + '" aria-label="늘리기" onclick="stepBy(\'' + kind + '\',1)"' + (on && v < c.max ? '' : ' disabled') + '>+</button>' +
+        '<button type="button" class="st-apply" id="stApply_' + kind + '" onclick="stepApply(\'' + kind + '\')"' + (on ? '' : ' disabled') + '>적용</button></div>' +
+        (note ? '<div class="st-note">' + note + '</div>' : '') + '</div>';
+    }
+
     // ===== 근무 변경 =====
     function openModal(key, team) {
       target = { key, team };
@@ -1006,67 +1313,97 @@ var CAL = (function () {
       const o = ovrOf(curProc);
       const ds = CAL.dayStatus(o, y, m, d);
       const cur = (o[key] || {})[team];
-      const p = person(curProc, team);
       const base = CAL.baseShift(team, y, m, d);
-      const mine = !BOOT.isAdmin && !BOOT.isForeman && String(curProc) === String(BOOT.me.process) && team === BOOT.me.team;
+      const isWorker = !BOOT.isAdmin && !BOOT.isForeman;
+      const sameProc = isWorker && String(curProc) === String(BOOT.me.process);
       const managed = BOOT.isAdmin || (BOOT.isForeman && team === BOOT.me.team);
-      $('modalTitle').innerText = `${key} [${procName(curProc)} ${team}조]`;
-      $('modalInfo').innerHTML = `현재: <b>${esc(showTxt(ds[team].txt))}</b> (${ds[team].hrs}시간)<br>기본 편성: ${CAL.NAMES[base]}`;
+      $('modalTitle').innerText = key + ' [' + procName(curProc) + ' ' + team + '조]';
+      $('modalInfo').innerHTML = '현재: <b>' + esc(showTxt(ds[team].txt)) + '</b> (' + ds[team].hrs + '시간)<br>기본 편성: ' + CAL.NAMES[base];
+      $('modalStatus').textContent = CAL.isHoliday(y, m, d) ? '공휴일은 연차를 쓰지 않아요' : '';
+      // 일일메모
+      const memo = memoOf(curProc, key, team);
+      if (canMemo(curProc, team)) {
+        $('modalMemo').style.display = '';
+        $('modalMemo').innerHTML = '<div class="memo-label">📝 일일메모 · ' + team + '조 (최대 ' + MEMO_MAX + '자)</div>' +
+          '<div class="memo-row"><textarea id="memoInput" rows="2" maxlength="' + MEMO_MAX + '" placeholder="메모를 적어 주세요" onkeydown="if(event.key===\'Enter\'&&!event.isComposing&&event.keyCode!==229){event.preventDefault();saveMemo()}">' + esc(memo) + '</textarea><button type="button" id="memoSave" onclick="saveMemo()">메모 저장</button></div><div class="memo-status" id="memoStatus"></div>';
+      } else if (memo) {
+        $('modalMemo').style.display = '';
+        $('modalMemo').innerHTML = '<div class="memo-label">📝 일일메모 · ' + team + '조</div><div class="memo-view">' + esc(memo) + '</div>';
+      } else { $('modalMemo').style.display = 'none'; $('modalMemo').innerHTML = ''; }
+
+      // 나머지조 2교대 분담 선택: 고른 값이 휴가·공가·코로마 값의 접미사(:J/:Y)가 된다
+      const curPv = cur ? CAL.parseVal(cur) : { kind: '', split: '' };
+      SPLIT = ['VAC', 'GONGGA', 'KOROMA'].indexOf(curPv.kind) >= 0 ? (curPv.split || '') : '';
+      const splitBox = '<div class="split-box"><div class="sp-title">나머지조 2교대 분담</div>' +
+        [['', '4h·4h (기본)'], ['J', '조간2교 16h · 야간2교 8h'], ['Y', '조간2교 8h · 야간2교 16h']].map(o =>
+          '<button type="button" class="sp-opt' + (SPLIT === o[0] ? ' on' : '') + '" data-split="' + o[0] + '" aria-pressed="' + (SPLIT === o[0]) + '" onclick="pickSplit(this)">' + o[1] + '</button>').join('') + '</div>';
+      const vacBtn = '<button data-kind="VAC" onclick="setAbs(this.dataset.kind)" style="color:#e11d48;">🏖️ 휴가 (나머지조 2교대 자동)</button>';
+      const gongBtn = '<button data-kind="GONGGA" onclick="setAbs(this.dataset.kind)" style="color:#b45309;">🏛️ 공가 (연차 소모 없음, 나머지조 2교대 자동)</button>';
+      const EARLY_ACT = ['', 'EARLY_MORN', 'EARLY_DAY', 'EARLY_NIGHT'];
+      const EARLY_TITLE = ['', '🏃 조간조퇴 (주간조 조출)', '🏃 주간조퇴 (야간조 조출)', '🏃 야간조퇴 (조간조 조출)'];
+      const earlyKinds = ['EARLY_MORN', 'EARLY_DAY', 'EARLY_NIGHT'];
       let btns = '';
       if (managed) {
-        btns = (BOOT.isForeman ? '<button onclick="openForemanDay(\'' + key + '\')">📋 이 날짜 모든 공정 ' + team + '조 보기</button>' : '') + `
-          <button onclick="setShift('RESET')">🔄 기본 편성으로 복원</button>
-          <button onclick="setShift('VAC')" style="color:#e11d48;">🏖️ 휴가 (연차 1일, 나머지조 12h 대근 자동)</button>
-          <button onclick="setShift('KOROMA')" style="color:#7c3aed;">🛠️ 코로마 (3명 모두 잔업 4h, 나머지조 대근 자동)</button>
-          <button onclick="setShift('EARLY_MORN')" style="color:#ea580c;">🏃 조간조퇴 (주간조 10:30 조기출근)</button>
-          <button onclick="setShift('EARLY_DAY')" style="color:#ea580c;">🏃 주간조퇴 (야간조 18:30 조기출근)</button>
-          <hr style="border:0; border-top:1px solid #cbd5e1; width:100%; margin: 2px 0;">
-          <button onclick="setShift(1)">🌅 강제 지정: 조간</button>
-          <button onclick="setShift(2)">☀️ 강제 지정: 주간</button>
-          <button onclick="setShift(3)">🌙 강제 지정: 야간</button>
-          <button onclick="setShift(4)">🛋️ 강제 지정: 휴무</button>
-          <button onclick="setShift('OT1')">⚡ 수동 조간대근 (+4h)</button>
-          <button onclick="setShift('OT2')">⚡ 수동 야간대근 (+4h)</button>
-          <button onclick="setShift('EARLY_DAY_IN')">⚡ 수동 주간조기출근 (+4h)</button>
-          <button onclick="setShift('EARLY_NIGHT_IN')">⚡ 수동 야간조기출근 (+4h)</button>`;
-      } else if (mine) {
-        if (['VAC', 'EARLY_MORN', 'EARLY_DAY'].indexOf(cur) >= 0) {
-          btns = '<button data-value="RESET" onclick="setShift(this.dataset.value)">' + (cur === 'VAC' ? '휴가 취소' : '조퇴 취소') + '</button>';
+        stepInit('early', cur, earlyKinds); stepInit('ot', cur, ['OT']);
+        STEPV.earlyAct = EARLY_ACT[base] || '';
+        const earlyOn = base >= 1 && base <= 3 && !!CAL.earlyFollower(team, y, m, d);
+        const earlyTitle = EARLY_TITLE[base] || '🏃 조퇴';
+        const earlyNote = earlyOn ? '' : '휴무일에는 조퇴를 넣을 수 없어요';
+        btns = (BOOT.isForeman ? '<button onclick="openForemanDay(\'' + key + '\')">📋 이 날짜 모든 공정 ' + team + '조 보기</button>' : '') +
+          '<button data-value="RESET" onclick="setShift(this.dataset.value)">🔄 기본 편성으로 복원</button>' + splitBox + vacBtn + gongBtn +
+          '<button data-kind="KOROMA" onclick="setAbs(this.dataset.kind)" style="color:#7c3aed;">🛠️ 코로마 (3명 모두 잔업 4h, 나머지조 2교대 자동)</button>' +
+          stepperHtml('early', earlyTitle, earlyOn, earlyNote) +
+          stepperHtml('ot', '⚡ 잔업 (0.5시간 단위)', true, '') +
+          '<hr style="border:0; border-top:1px solid #cbd5e1; width:100%; margin: 2px 0;">' +
+          '<button onclick="setShift(1)">🌅 강제 지정: 조간</button>' +
+          '<button onclick="setShift(2)">☀️ 강제 지정: 주간</button>' +
+          '<button onclick="setShift(3)">🌙 강제 지정: 야간</button>' +
+          '<button onclick="setShift(4)">🛋️ 강제 지정: 휴무</button>';
+      } else if (sameProc) {
+        // 같은 공정 근무자: 어느 조든 휴가·공가·조퇴 신청/취소 (그 외는 관리자)
+        const pv = curPv;
+        if (['VAC', 'GONGGA', 'EARLY_MORN', 'EARLY_DAY', 'EARLY_NIGHT'].indexOf(pv.kind) >= 0) {
+          btns = '<button data-value="RESET" onclick="setShift(this.dataset.value)">' + (pv.kind === 'VAC' ? '휴가 취소' : pv.kind === 'GONGGA' ? '공가 취소' : '조퇴 취소') + '</button>';
         } else if (cur) $('modalInfo').innerHTML += '<br>관리자가 지정한 근무예요. 변경은 관리자에게 문의해 주세요.';
         else if (base === 4) $('modalInfo').innerHTML += '<br>휴무일이에요.';
         else {
-          btns = '<button data-value="VAC" onclick="setShift(this.dataset.value)" style="color:#e11d48;">휴가 신청 · 연차 1일</button>';
-          const nextShift = base === 1 ? 2 : base === 2 ? 3 : 0;
-          const nextTeam = CAL.TEAMS.find(t => t !== team && CAL.baseShift(t, y, m, d) === nextShift);
-          if (nextShift && nextTeam && ds[team].code === 'BASE' && ds[nextTeam].code === 'BASE') {
-            const action = base === 1 ? 'EARLY_MORN' : 'EARLY_DAY';
-            const label = base === 1 ? '조간조퇴 · 주간조 10:30 조기출근' : '주간조퇴 · 야간조 18:30 조기출근';
-            btns += '<button data-value="' + action + '" onclick="setShift(this.dataset.value)">' + label + '</button>';
-            $('modalInfo').innerHTML += '<br>조퇴는 4시간 근무, 연차 차감 없음';
-          } else if (base === 3) $('modalInfo').innerHTML += '<br>야간조퇴는 현재 계산 기준에 포함되어 있지 않습니다.';
-          else $('modalInfo').innerHTML += '<br>현재 대근·지정 편성과 충돌해 조퇴 변경은 관리자에게 문의해 주세요.';
+          btns = splitBox + vacBtn + gongBtn;
+          const f = CAL.earlyFollower(team, y, m, d);
+          const fst = f ? CAL.dayStatus(o, f.y, f.m, f.d)[f.team] : null;
+          if (f && ds[team].code === 'BASE' && fst && fst.code === 'BASE') {
+            stepInit('early', cur, earlyKinds); STEPV.earlyAct = EARLY_ACT[base];
+            btns += stepperHtml('early', EARLY_TITLE[base], true, '연차 차감 없음');
+          } else $('modalInfo').innerHTML += '<br>현재 대근·지정 편성과 충돌해 조퇴 변경은 관리자에게 문의해 주세요.';
         }
+        if (team !== BOOT.me.team) $('modalInfo').innerHTML += '<br>같은 공정의 ' + team + '조 근무를 대신 수정하는 중이에요.';
       } else {
-        $('modalInfo').innerHTML += BOOT.isForeman ? '<br>직장은 자기 조(' + BOOT.me.team + '조) 근무만 수정할 수 있어요. 다른 조는 확인용이에요.' : '<br>본인 근무만 바꿀 수 있어요.';
+        $('modalInfo').innerHTML += BOOT.isForeman ? '<br>직장은 자기 조(' + BOOT.me.team + '조) 근무만 수정할 수 있어요. 다른 조는 확인용이에요.' : '<br>다른 공정은 확인용이에요.';
       }
       $('modalBtns').innerHTML = btns;
       $('modalBackdrop').style.display = 'flex';
     }
     function closeModal() { $('modalBackdrop').style.display = 'none'; }
+    // 2교대 분담 선택 (''=4h·4h, 'J'=조간2교 16h, 'Y'=야간2교 16h)
+    let SPLIT = '';
+    function pickSplit(btn) {
+      SPLIT = btn.dataset.split || '';
+      document.querySelectorAll('#modalBtns .sp-opt').forEach(b => { const on = (b.dataset.split || '') === SPLIT; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
+    }
+    function setAbs(kind) { setShift(kind + (SPLIT ? ':' + SPLIT : '')); }
     async function setShift(val) {
-      closeModal();
-      const o = ovrOf(curProc), day = o[target.key] || {};
-      if (val === 'VAC' || val === 'KOROMA') {
-        const other = CAL.TEAMS.find(t => t !== target.team && (day[t] === 'VAC' || day[t] === 'KOROMA'));
-        if (other) { alert(`그날은 이미 ${other}조가 ${day[other] === 'VAC' ? '휴가' : '코로마'}로 빠져 있어요.`); return; }
+      const o = ovrOf(curProc);
+      const vk = CAL.parseVal(val).kind, isAbs = vk === 'VAC' || vk === 'GONGGA' || vk === 'KOROMA';
+      if (isAbs) {
         const kp = CAL.parseKey(target.key);
-        if (CAL.baseShift(target.team, kp.y, kp.m, kp.d) === 4) { alert('휴무일에는 휴가나 코로마를 넣을 수 없어요.'); return; }
+        const msg = CAL.canAddAbsence(o, target.team, val, kp.y, kp.m, kp.d);
+        if (msg) { alert(msg); return; }
       }
+      closeModal();
       try {
         const r = await call('apiSetShift', target.key, curProc, target.team, val);
         BOOT.overrides[String(curProc)] = r.overrides;
         render();
-        if (val === 'VAC' || val === 'KOROMA') {
+        if (isAbs) {
           const { y, m, d } = CAL.parseKey(target.key);
           const ds = CAL.dayStatus(r.overrides, y, m, d);
           const warn = CAL.TEAMS.filter(t => ds[t].otH > 0).map(t => ({ t, h: CAL.sumHours(r.overrides, t, y, m, d, CAL.WARN_DAYS) }))
@@ -1075,7 +1412,6 @@ var CAL = (function () {
         }
       } catch (e) {}
     }
-
 
     function openAdminDay(key) {
       if (!BOOT || !BOOT.isAdmin) return;
@@ -1177,15 +1513,18 @@ var CAL = (function () {
         const p = person(c.process, c.team);
         const ds = CAL.dayStatus(ovrOf(c.process), y, m, d);
         let what;
-        if (c.after === 'VAC') what = '휴가 신청';
-        else if (c.before === 'VAC' && !c.after) what = '휴가 취소 → 원래 근무';
-        else if (c.after === 'KOROMA') what = '코로마';
-        else if (c.before === 'KOROMA' && !c.after) what = '코로마 취소 → 원래 근무';
-        else what = (LABEL[c.before] || c.before) + ' → ' + (LABEL[c.after] || c.after);
+        const kA = kindOf(c.after), kB = kindOf(c.before), sA = splitOf(c.after);
+        if (kA === 'VAC' && kB !== 'VAC') what = sA ? lbl(c.after) + ' 신청' : '휴가 신청';
+        else if (kB === 'VAC' && !c.after) what = '휴가 취소 → 원래 근무';
+        else if (kA === 'GONGGA' && kB !== 'GONGGA') what = sA ? lbl(c.after) : '공가';
+        else if (kB === 'GONGGA' && !c.after) what = '공가 취소 → 원래 근무';
+        else if (kA === 'KOROMA' && kB !== 'KOROMA') what = sA ? lbl(c.after) : '코로마';
+        else if (kB === 'KOROMA' && !c.after) what = '코로마 취소 → 원래 근무';
+        else what = lbl(c.before) + ' → ' + lbl(c.after);
         const covers = CAL.TEAMS.filter(t => ds[t].code === 'COVER');
         const mineScope = BOOT.isForeman || (!BOOT.isAdmin && String(c.process) === String(me.process));
         const mineCover = mineScope && covers.indexOf(me.team) >= 0;
-        const cov = covers.length && (c.after === 'VAC' || c.after === 'KOROMA')
+        const cov = covers.length && (kA === 'VAC' || kA === 'GONGGA' || kA === 'KOROMA')
           ? '<br>대근: ' + covers.map(t => (t === me.team && mineScope
               ? `<span class="me">${t}조(${esc(showTxt(ds[t].txt))}) ← 내 대근</span>`
               : `${t}조(${esc(showTxt(ds[t].txt))})`)).join(', ') : '';
@@ -1206,7 +1545,7 @@ var CAL = (function () {
           <tr><td>지난 2주 근무</td><td class="${s.over2 ? 'warn' : ''}">${s.h2}시간 (주 평균 ${s.w2})</td></tr>
           <tr><td>지난 3주 평균</td><td class="${s.over3 ? 'warn' : ''}">주 ${s.w3}시간</td></tr>
           <tr><td>${currentYear}년 연차</td><td>부여 ${s.grant === undefined ? '-' : s.grant} · 사용 ${s.used} · 잔여 ${s.remain === null ? '-' : s.remain}</td></tr>
-        </table><br>`;
+        </table>${payHtml(me.process, me.team)}<br>`;
       }
       html += `<div class="form-col">
         <input id="pinOld" type="password" inputmode="numeric" placeholder="현재 PIN">
@@ -1215,6 +1554,19 @@ var CAL = (function () {
         <button class="btn-gray" onclick="logout()">로그아웃</button>
       </div>`;
       openPanel('내 정보', html);
+    }
+    // 근무 산출식 (전월16일~당월15일)
+    function payHtml(proc, team) {
+      let pb;
+      try { pb = CAL.payBreakdown(ovrOf(proc), team, currentYear, currentMonth); } catch (e) { return ''; }
+      if (!pb) return '';
+      const range = (typeof pb.from === 'string' && typeof pb.to === 'string') ? ' <span class="pay-small">' + esc(pb.from) + ' ~ ' + esc(pb.to) + '</span>' : '';
+      const lines = (pb.lines || []).map(l => '<div class="pay-line">' + esc(l.eq) + '</div>').join('') || '<div class="pay-line">이 기간에 계산할 근무가 없어요</div>';
+      const uns = (pb.unsupported || []).map(u => typeof u === 'string' ? u : (u && (u.label || u.name)) || String(u)).join(', ');
+      return '<div class="pay-box"><h4>근무 산출식 (전월16일~당월15일)</h4>' + range + lines +
+        '<div class="pay-total">합계 환산 ' + esc(CAL.fmtH(pb.total)) + '시간</div><div class="pay-line">수당 = 통상시급 × 환산 ' + esc(CAL.fmtH(pb.total)) + '시간</div>' +
+        '<div class="pay-small">야간근로는 조간 0h · 주간 0.5h · 야간 7.5h로 가정해요. 대근·조출·잔업 시간대의 야간 여부는 반영하지 않아요.</div>' +
+        '<div class="pay-small">해당 없음(미계산): ' + esc(uns || '명절근로, 토요근로, 일요근로, 보전수당') + '</div></div>';
     }
     async function changePin() {
       try { await call('apiChangePin', $('pinOld').value, $('pinNew').value); alert('PIN을 바꿨어요.'); closePanel(); } catch (e) {}
@@ -1244,11 +1596,10 @@ var CAL = (function () {
       if (!confirm(targetLabel + ' PIN을 초기화할까요?')) return;
       try { const r = await call('apiResetPin', pid); alert(targetLabel + ' 새 초기 코드: ' + r.code); } catch (e) {}
     }
-    const LABEL = { '': '기본', VAC: '휴가', KOROMA: '코로마', EARLY_MORN: '조간조퇴', EARLY_DAY: '주간조퇴', '1': '조간', '2': '주간', '3': '야간', '4': '휴무', OT1: '조간대근', OT2: '야간대근', EARLY_DAY_IN: '주간조기', EARLY_NIGHT_IN: '야간조기' };
     async function showLog() {
       try {
         const logs = await call('apiLog');
-        const rows = logs.map(l => `<tr><td>${esc(l.at)}</td><td>${esc(l.date)}</td><td>${esc(procName(l.process))} ${esc(l.team)}</td><td>${LABEL[l.before] || esc(l.before)} → ${LABEL[l.after] || esc(l.after)}</td></tr>`).join('');
+        const rows = logs.map(l => `<tr><td>${esc(l.at)}</td><td>${esc(l.date)}</td><td>${esc(procName(l.process))} ${esc(l.team)}</td><td>${esc(lbl(l.before))} → ${esc(lbl(l.after))}</td></tr>`).join('');
         openPanel('변경 이력 (최근 200건)', `<div class="pscroll"><table class="ptable"><tr><th>변경 시각</th><th>근무일</th><th>공정·조</th><th>내용</th></tr>${rows}</table></div>`);
       } catch (e) {}
     }
