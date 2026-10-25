@@ -1,13 +1,7 @@
-# 근무관리앱 (휴대폰 화면)
+# Shift Calendar (screen only)
 
-4조 3교대 근무의 휴가·대근·조퇴·전달사항을 공유하는 휴대폰 전용 웹 화면입니다.
+Single-file screen (`index.html`) for a 4-team 3-shift work calendar.
 
-- 화면: `index.html` 한 파일 (GitHub Pages로 제공)
-- 서버: Google Apps Script 웹앱 + 비공개 Google Sheets (이 저장소에 서버 코드와 데이터는 없습니다)
-- 로그인: 공정 + 조 + 개인 PIN (서버에서 검증). 근무자 이름은 수집하지 않고 공정·조로 구분합니다.
-- 권한: 근무자는 자기 공정의 모든 조에 대해 휴가·공가·조퇴 신청/취소, 직장은 모든 공정의 자기 조 근무, 관리자는 전체
-- 서버 주소는 `index.html` 안의 `API_URL`입니다. 바꾸려면 이 값을 수정합니다.
-
-## 주의
-- 로그인 정보(PIN)와 근무 데이터는 이 저장소에 저장하지 않습니다.
-- 서버 주소를 아는 누구나 로그인을 시도할 수 있으므로 PIN은 쉬운 숫자를 피해 주세요.
+- The calendar server fetches `index.html` from GitHub Pages and serves it from its own address.
+- Login, data and saving are handled by the server. This repository contains no data, passwords or server code.
+- Updating the screen: replace `index.html` in this repository. The server picks it up within about a minute.
