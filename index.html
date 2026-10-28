@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta name="shift-calendar-ui" content="V2.2.1 server screen">
+  <meta name="shift-calendar-ui" content="V2.3 server screen">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>근무달력 V2.2.1 · 4조 3교대</title>
+  <title>근무달력 V2.3 · 4조 3교대</title>
   <style>
     :root {
       --bg: #e5e7eb;
@@ -419,10 +419,10 @@ body {background:#f8f8f8}
     let viewTeam = "ALL";
 
     function init() {
-      let message='V2.2.1 · 변경 시 자동 저장';
+      let message='V2.3 · 변경 시 자동 저장';
       try {
         const saved=localStorage.getItem(STORAGE_KEY),legacy=saved===null?localStorage.getItem(OLD_STORAGE_KEY):null;
-        if(saved!==null || legacy!==null){appData=normalizeData(JSON.parse(saved!==null?saved:legacy));message=saved!==null?'V2.2.1 저장 데이터 불러옴':'V1.8 데이터를 복사해 읽었어요 · 원본 유지';}
+        if(saved!==null || legacy!==null){appData=normalizeData(JSON.parse(saved!==null?saved:legacy));message=saved!==null?'V2.3 저장 데이터 불러옴':'V1.8 데이터를 복사해 읽었어요 · 원본 유지';}
       } catch(e){message='저장 데이터 읽기 실패 · 원본 보호를 위해 저장을 막았어요';storageReadFailed=true;}
       document.getElementById('globalNotice').value=appData.globalNotice||'';
       document.getElementById('saveStatus').textContent=message;
@@ -996,8 +996,8 @@ body {background:#f8f8f8}
     }
     function saveData() {
       if(storageReadFailed)return false;
-      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));const el=document.getElementById('saveStatus');el.textContent='V2.2.1 저장됨 · '+new Date().toLocaleTimeString();el.style.color='#10b981';return true;}
-      catch(e){const el=document.getElementById('saveStatus');el.textContent='V2.2.1 저장 실패';el.style.color='#ef4444';return false;}
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));const el=document.getElementById('saveStatus');el.textContent='V2.3 저장됨 · '+new Date().toLocaleTimeString();el.style.color='#10b981';return true;}
+      catch(e){const el=document.getElementById('saveStatus');el.textContent='V2.3 저장 실패';el.style.color='#ef4444';return false;}
     }
     document.getElementById('modalBackdrop').addEventListener('click',function(e){if(e.target===this)closeModal();});
     document.addEventListener('keydown',function(e){
@@ -1012,7 +1012,7 @@ body {background:#f8f8f8}
     });
     init();
   </script>
-  <div class="app-version">V2.2.1</div>
+  <div class="app-version">V2.3</div>
 <style id="sync-layer-style">
 #syncGate { position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center; background: var(--bg); padding: 16px; box-sizing: border-box; }
 #syncGate.open { display: flex; }
@@ -1339,7 +1339,7 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
       notice = '서버 자료를 불러왔어요. 이 PC의 이전 자료는 백업해 두었어요.';
       afterAdminReady();
     } else {
-      showLogin('서버 자료를 불러오지 못했어요.', true);
+      showChoice('서버 연결 오류', '서버 자료를 불러오지 못했어요. 기존 PC 자료는 유지돼요.', [{ label: '다시 시도', run: chooseServer }, { label: 'PC 자료 보기', secondary: true, run: enterOffline }]);
     }
   }
 
@@ -1369,8 +1369,8 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
     baseRev = meta ? meta.baseRev : 0;
     dirty = meta ? Boolean(meta.dirty) : false;
     let res;
-    try { res = await api('GET', '/data'); } catch (error) { showLogin('서버에 연결할 수 없어요.', true); return; }
-    if (res.status !== 200) { showLogin('', true); return; }
+    try { res = await api('GET', '/data'); } catch (error) { showChoice('서버 연결 오류', '서버에 연결할 수 없어요. 기존 PC 자료는 유지돼요.', [{ label: '다시 시도', run: startAdmin }, { label: 'PC 자료 보기', secondary: true, run: enterOffline }]); return; }
+    if (res.status !== 200) { showChoice('서버 연결 오류', '서버 자료를 불러오지 못했어요. 기존 PC 자료는 유지돼요.', [{ label: '다시 시도', run: startAdmin }, { label: 'PC 자료 보기', secondary: true, run: enterOffline }]); return; }
     const serverRev = res.json.rev;
     const serverData = res.json.data;
     const local = !storageReadFailed && hasContent(appData);
@@ -1378,7 +1378,7 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
       if (local) {
         showChoice('서버에 처음 올려요', '서버에 아직 자료가 없어요. 이 PC에 저장된 달력 자료(' + weight(appData) + '건)를 서버에 올려 시작할까요?', [
           { label: '올리기', run: async () => { closeGate(); baseRev = 0; dirty = true; editSeq += 1; writeMeta(); afterAdminReady(); await push(false); } },
-          { label: '취소 (로그아웃)', secondary: true, run: () => logout(true) }
+          { label: '취소', secondary: true, run: enterOffline }
         ]);
         return;
       }
@@ -1410,7 +1410,7 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
       if (!local || sameContent(appData, serverData)) { adopt(serverData, serverRev); afterAdminReady(); return; }
       showConflict(serverRev, serverData, res.json.updatedAt, '이 PC에 저장된 자료와 서버 자료가 달라요.');
     } catch (error) {
-      showLogin('서버 자료 형식을 확인해 주세요. 이 PC 자료는 바꾸지 않았어요.', true);
+      showChoice('자료 확인 필요', '서버 자료 형식을 확인해 주세요. 이 PC 자료는 바꾸지 않았어요.', [{ label: '다시 시도', run: startAdmin }, { label: 'PC 자료 보기', secondary: true, run: enterOffline }]);
     }
   }
 
@@ -1433,7 +1433,7 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
   async function loadViewer(initial) {
     try {
       const res = await api('GET', '/data' + (!initial && viewerRev ? '?since=' + viewerRev : ''));
-      if (res.status === 401) { showLogin('로그인 시간이 지났어요. 다시 들어가 주세요.'); return; }
+      if (res.status === 401) { viewerFailed = true; renderStatus(); return; }
       if (res.status === 200) {
         viewerFailed = false;
         lastViewerOk = new Date();
@@ -1510,7 +1510,7 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
       renderStatus();
       return;
     }
-    if (result.status === 401) { pushState = 'login'; renderStatus(); return; }
+    if (result.status === 401) { pushState = 'failed'; renderStatus(); return; }
     if (result.status === 409) {
       pushState = 'conflict';
       renderStatus();
@@ -1539,16 +1539,7 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
   }
 
   async function pollSync() {
-    clearTimeout(statusTimer);
-    if (role !== 'admin') return;
-    try {
-      const res = await api('GET', '/sync');
-      if (res.status === 200) syncStatus = res.json;
-      else if (res.status === 401 && pushState !== 'sending') pushState = 'login';
-    } catch (error) { syncStatus = syncStatus; }
     renderStatus();
-    const state = syncStatus && syncStatus.drive && syncStatus.drive.state;
-    statusTimer = setTimeout(pollSync, state === 'pending' || state === 'failed' || pushState === 'sending' ? 5000 : 60000);
   }
 
   async function logout(skipConfirm) {
@@ -1607,27 +1598,18 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
       else text = '조회 전용 · 갱신 ' + (lastViewerOk ? hhmm(lastViewerOk) : '--:--');
     } else {
       const saved = lastLocalSave ? 'PC 저장됨 ' + hhmm(lastLocalSave) : 'PC 자동 저장';
-      const drive = syncStatus && syncStatus.drive;
-      const google = syncStatus && syncStatus.google;
       if (pushState === 'sending') { warn = true; text = saved + ' · 서버 반영 중'; }
-      else if (pushState === 'failed') { warn = true; text = saved + ' · 서버 반영 실패'; action('재시도', () => push(false)); action('로그인', () => showLogin('', true)); }
-      else if (pushState === 'login') { warn = true; text = saved + ' · 로그인 필요'; action('로그인', () => showLogin('로그인하면 서버에 반영해요.')); }
+      else if (pushState === 'failed' || pushState === 'login') { warn = true; text = saved + ' · 서버 반영 실패'; action('재시도', () => push(false)); }
       else if (pushState === 'conflict') { warn = true; text = '서버 자료와 충돌'; action('해결', () => startAdmin()); }
       else if (pushState === 'blocked') { warn = true; text = saved + ' · 서버 반영 보류'; action('다시 반영', () => push(false)); }
       else if (pushState === 'rejected') { warn = true; text = '서버가 자료를 받지 않았어요 (' + rejectedCode + ')'; action('재시도', () => push(false)); }
       else if (dirty) { warn = true; text = saved + ' · 서버 반영 대기'; }
-      else if (!drive) text = saved + ' · 서버 확인 중';
-      else if (drive.state === 'ok') text = saved + ' · Drive 반영됨 ' + (drive.lastOkAt ? hhmm(drive.lastOkAt) : '');
-      else if (drive.state === 'pending') { warn = true; text = saved + ' · Drive 반영 중'; }
-      else if (drive.state === 'failed') { warn = true; text = saved + ' · Drive 반영 실패'; action('재시도', async () => { try { await api('POST', '/sync/retry'); } catch (error) { return; } pollSync(); }); }
-      else if (drive.state === 'reauth') { warn = true; text = 'Drive 재연결 필요'; if (google && google.configured) action('연결', showConnect); }
-      else { warn = true; text = saved + ' · Drive 미연결'; if (google && google.configured) action('Drive 연결', showConnect); }
+      else text = saved + ' · 서버 반영됨';
     }
     line.classList.toggle('warn', warn);
     line.textContent = text;
     node.append(line);
     if (notice) node.append(el('div', { class: 'sync-line', text: notice }));
-    action('로그아웃', () => logout(false));
     node.append(actions);
   }
 
@@ -1649,14 +1631,8 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
   });
 
   async function boot() {
-    showBusy('연결 확인 중…');
-    try {
-      const session = await api('GET', '/session');
-      if (session.status === 200 && session.json.role) { closeGate(); await enter(session.json.role); return; }
-      showLogin('');
-    } catch (error) {
-      showLogin('서버에 연결할 수 없어요.', true);
-    }
+    closeGate();
+    await enter(location.pathname === '/view' ? 'viewer' : 'admin');
   }
 
   boot();
