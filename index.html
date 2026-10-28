@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta name="shift-calendar-ui" content="V2.3.1 server screen">
+  <meta name="shift-calendar-ui" content="V2.3.2 server screen">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>근무달력 V2.3.1 · 4조 3교대</title>
+  <title>근무달력 V2.3.2 · 4조 3교대</title>
   <style>
     :root {
       --bg: #e5e7eb;
@@ -291,6 +291,9 @@ body {background:#f8f8f8}
 .modal-box #modalButtons button.pick {text-align:left;font-size:15px;min-height:40px;padding:0 12px;border-radius:12px}
 .modal-box #modalButtons button.pick.on {background:var(--accent);color:#fff;box-shadow:inset 0 0 0 2px var(--mint-dark)}
 </style>
+<style id="reviewed-popup-v232">.modal-box #modalButtons .compact-time button {font-size:16px; width:18px; min-width:18px; flex:0 0 18px}.modal-box .compact-time input {width:30px;min-width:30px;flex:0 0 30px}
+.modal-box {--card-bg:#1a1b26;--text:#f3f4f6;--text-muted:#8f95b2;--border:#282a3c;--accent:#6366f1;--accent2:#242640;--sub-bg:#14151f;--mint-dark:#a5b4fc;background:#1a1b26;color:#f3f4f6;border-color:#282a3c;box-shadow:0 16px 40px rgba(0,0,0,.5)} .modal-box .summary-card{background:#14151f;border-color:#282a3c;color:#f3f4f6} .modal-box #modalButtons button {background:#252742;color:#c7d2fe} .modal-box #modalButtons .compact-time button{background:transparent;color:#c7d2fe} .modal-box .compact-time input,.modal-box .compact-memo input{background:#14151f;color:#f3f4f6} .modal-box .compact-memo input::placeholder{color:#8f95b2} .modal-box .sc-name{color:#a5b4fc}.modal-box .sc-memo{color:#c084fc}.modal-box .reason-positive{color:#10b981}.modal-box .reason-negative{color:#f59e0b}.modal-box #modalButtons button.fold-btn{background:#14151f;color:#d1d5db;border-color:#282a3c}.modal-box button.close-btn{background:#6366f1;color:white}.modal-box .adjustment-grid input:disabled{background:#14151f;color:#8f95b2}
+.modal-box .status-card{gap:2px}.modal-box .status-card .sc-label{height:14px;line-height:14px;color:#a5b4fc}.modal-box .status-card .sc-name{font-size:34px;line-height:38px;height:38px;color:#f3f4f6}.modal-box .status-card .sc-hours{color:#d1d5db}.modal-box .status-card .reason-positive{color:#10b981}.modal-box .status-card .reason-negative{color:#f59e0b}.modal-box .status-card .reason-net{color:#d1d5db}.modal-box .status-card .sc-memo{color:#c084fc}.modal-box .status-card #modalFeedback.sc-guide{color:#aeb4ca}.modal-box #modalButtons button{color:#d1d5db}.modal-box #modalButtons .compact-time button{color:#a5b4fc}</style>
 </head>
 <body>
 
@@ -419,10 +422,10 @@ body {background:#f8f8f8}
     let viewTeam = "ALL";
 
     function init() {
-      let message='V2.3.1 · 변경 시 자동 저장';
+      let message='V2.3.2 · 변경 시 자동 저장';
       try {
         const saved=localStorage.getItem(STORAGE_KEY),legacy=saved===null?localStorage.getItem(OLD_STORAGE_KEY):null;
-        if(saved!==null || legacy!==null){appData=normalizeData(JSON.parse(saved!==null?saved:legacy));message=saved!==null?'V2.3.1 저장 데이터 불러옴':'V1.8 데이터를 복사해 읽었어요 · 원본 유지';}
+        if(saved!==null || legacy!==null){appData=normalizeData(JSON.parse(saved!==null?saved:legacy));message=saved!==null?'V2.3.2 저장 데이터 불러옴':'V1.8 데이터를 복사해 읽었어요 · 원본 유지';}
       } catch(e){message='저장 데이터 읽기 실패 · 원본 보호를 위해 저장을 막았어요';storageReadFailed=true;}
       document.getElementById('globalNotice').value=appData.globalNotice||'';
       document.getElementById('saveStatus').textContent=message;
@@ -676,6 +679,8 @@ body {background:#f8f8f8}
         s.hrs=absent?0:Math.max(0,s.actualStart!==null&&s.actualEnd!==null?(s.actualEnd-s.actualStart)/60:s.plannedHours+inH+ot-out);
         s.recognized=absent?8:s.hrs;
         s.otH=absent?0:(s.role===4 || s.offOvertime?s.hrs:Math.max(s.hrs-8,0));
+        const summaryHours=s.hrs+out;
+        s.summaryOtH=absent?0:(s.role===4 || s.offOvertime?summaryHours:Math.max(summaryHours-8,0));
         s.outH=absent||s.role===4?0:Math.max(8-s.hrs,0);
         s.netH=absent||s.role===4?0:s.hrs-8;
         if((s.autoInH||r.inH) && !absent && hasWork)s.cls='b-ot';
@@ -694,11 +699,11 @@ body {background:#f8f8f8}
       const dim = (yy, mm) => new Date(yy, mm, 0).getDate();
       for (let d = 16; d <= dim(pY, pM); d++) {
         const st = getDayStatus(pY, pM, d);
-        TEAMS.forEach(t => { res[t] += st[t].otH; });
+        TEAMS.forEach(t => { res[t] += st[t].summaryOtH; });
       }
       for (let d = 1; d <= Math.min(15, dim(y, m)); d++) {
         const st = getDayStatus(y, m, d);
-        TEAMS.forEach(t => { res[t] += st[t].otH; });
+        TEAMS.forEach(t => { res[t] += st[t].summaryOtH; });
       }
       TEAMS.forEach(t => { res[t] = Math.round(res[t] * 10) / 10; });
       return res;
@@ -740,7 +745,7 @@ body {background:#f8f8f8}
         picker.value = formattedMonth;
       }
 
-      document.getElementById("monthSelectButton").textContent=formattedMonth;
+      document.getElementById("monthSelectButton").textContent=`${currentYear}년 ${currentMonth}월`;
       renderTodayWidget();
 
       const mDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -878,7 +883,7 @@ body {background:#f8f8f8}
       document.getElementById('modalButtons').innerHTML=`
         <section class="summary-card status-card" aria-label="근무 상태"><div class="sc-label">${team}조 근무 상태</div><div class="sc-name">${esc(s.txt)}</div><div class="sc-hours">${mark}</div><div class="sc-memo">${memo?'메모: '+esc(memo):''}</div><div id="modalFeedback" class="sc-guide" role="status" aria-live="polite">${esc(guide)}</div></section>
         <div class="base-round-group"><button type="button" class="${on(mode==='base').trim()}" onclick="setShift('RESET')">기본복원</button><div class="compact-two"><button type="button" class="${on(mode==='vac').trim()}" aria-pressed="${mode==='vac'}" onclick="setShift('VAC')">휴가</button><button type="button" class="${on(mode==='gong').trim()}" aria-pressed="${mode==='gong'}" onclick="setShift('GONGGA')">공가</button></div></div>
-        <div class="adjustment-grid${absent?' locked':''}">${[['inH','조출'],['otH','잔업'],['outH','조퇴']].map(([field,label])=>{const value=field==='inH'?Math.max(r.inH,s.autoInH||0):r[field];return '<div class="adjustment-column"><div class="compact-time"><button type="button"'+dis+' onclick="stepAdj(\''+field+'\',-1)" aria-label="'+label+' 시간 줄이기">&lt;</button><input id="hours_'+field+'" type="number" min="0" max="'+(field==='outH'?7:12)+'" step="1" value="'+value+'" data-original="'+value+'" aria-label="'+label+' 시간"'+dis+'><button type="button"'+dis+' onclick="stepAdj(\''+field+'\',1)" aria-label="'+label+' 시간 늘리기">&gt;</button></div><button type="button"'+dis+' onclick="stepApply(\''+field+'\')">'+label+'</button></div>';}).join('')}</div>
+        <div class="adjustment-grid${absent?' locked':''}">${[['inH','조출'],['otH','잔업'],['outH','조퇴']].map(([field,label])=>{const value=field==='inH'?Math.max(r.inH,s.autoInH||0):r[field];return '<div class="adjustment-column"><div class="compact-time"><button type="button"'+dis+' onclick="stepAdj(\''+field+'\',-1)" aria-label="'+label+' 시간 줄이기">−</button><input id="hours_'+field+'" type="number" min="0" max="'+(field==='outH'?7:12)+'" step="1" value="'+value+'" data-original="'+value+'" aria-label="'+label+' 시간"'+dis+'><button type="button"'+dis+' onclick="stepAdj(\''+field+'\',1)" aria-label="'+label+' 시간 늘리기">+</button></div><button type="button"'+dis+' onclick="stepApply(\''+field+'\')">'+label+'</button></div>';}).join('')}</div>
         <section class="compact-memo"><input id="memoInput" type="text" maxlength="15" aria-label="일일메모" placeholder="일일메모 (15자 이내)" onkeydown="if(event.key==='Enter'){event.preventDefault();saveMemo();}"><button onclick="saveMemo()">메모저장</button></section>
         ${foldBlock('force','근무 강제 지정',FORCE_LIST.map(([n,label])=>pick('F:'+n,label,mode==='force'&&r.base===n)).join(''))}
         ${foldBlock('manual','수동 근무 선택',MANUAL_LIST.map(([k,label])=>pick('M:'+k,label,mode==='manual'&&r.legacy===k)).join(''))}
@@ -999,8 +1004,8 @@ body {background:#f8f8f8}
     }
     function saveData() {
       if(storageReadFailed)return false;
-      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));const el=document.getElementById('saveStatus');el.textContent='V2.3.1 저장됨 · '+new Date().toLocaleTimeString();el.style.color='#10b981';return true;}
-      catch(e){const el=document.getElementById('saveStatus');el.textContent='V2.3.1 저장 실패';el.style.color='#ef4444';return false;}
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));const el=document.getElementById('saveStatus');el.textContent='V2.3.2 저장됨 · '+new Date().toLocaleTimeString();el.style.color='#10b981';return true;}
+      catch(e){const el=document.getElementById('saveStatus');el.textContent='V2.3.2 저장 실패';el.style.color='#ef4444';return false;}
     }
     document.getElementById('modalBackdrop').addEventListener('click',function(e){if(e.target===this)closeModal();});
     document.addEventListener('keydown',function(e){
@@ -1015,7 +1020,7 @@ body {background:#f8f8f8}
     });
     init();
   </script>
-  <div class="app-version">V2.3.1</div>
+  <div class="app-version">V2.3.2</div>
 <style id="sync-layer-style">
 #syncGate { position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center; background: var(--bg); padding: 16px; box-sizing: border-box; }
 #syncGate.open { display: flex; }
@@ -1062,7 +1067,7 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
   body .cal-grid { flex: none; }
   body .cal-cell { height: 84px; padding: 2px; }
   body .date-num, body .six-weeks .date-num { font-size: 13px; margin-bottom: 1px; }
-  body .date-big, body .six-weeks .date-big { font-size: calc(var(--sc, 1) * 17px); }
+  body .date-big, body .six-weeks .date-big { font-size: 26px; }
   body .shift-label, body .six-weeks .shift-label { font-size: calc(var(--sc, 1) * 14px); }
   body .day-memo, body .six-weeks .day-memo { font-size: calc(var(--sc, 1) * 10px); }
   body .badge-full, body .six-weeks .badge-full { font-size: calc(var(--sc, 1) * var(--wsc, 1) * 11px); gap: 2px; }
@@ -1080,7 +1085,7 @@ body.viewer-mode .direct-notice-textarea { cursor: default; }
   body.viewer-mode .today-box { display: none; }
   body.viewer-mode .month-picker-wrap { grid-column: 1 / 5; min-width: 0; gap: 4px; background: var(--card-bg); border-radius: 14px; padding: 0 4px; }
   body.viewer-mode .month-input-box { height: 42.5px; justify-content: center; padding: 0; gap: 0; border: 0; background: transparent; }
-  body.viewer-mode #monthSelectButton { font-size: 24px; min-height: 32px; padding: 0 2px; }
+  body.viewer-mode #monthSelectButton { font-size: 27px; min-height: 32px; padding: 0 2px; }
   body.viewer-mode .picker-nav-btn { width: 28px; height: 32px; font-size: 18px; }
   body.viewer-mode .btn-today-big { grid-column: 5; width: 100%; height: 42.5px; min-height: 0; padding: 8px 2px; font-size: 18px; font-weight: 900; border-radius: 14px; box-sizing: border-box; box-shadow: none; }
   body.viewer-mode .cal-cell { padding: 4px 2px; }
