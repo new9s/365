@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta name="shift-calendar-ui" content="V2.3 server screen">
+  <meta name="shift-calendar-ui" content="V2.3.1 server screen">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>근무달력 V2.3 · 4조 3교대</title>
+  <title>근무달력 V2.3.1 · 4조 3교대</title>
   <style>
     :root {
       --bg: #e5e7eb;
@@ -419,10 +419,10 @@ body {background:#f8f8f8}
     let viewTeam = "ALL";
 
     function init() {
-      let message='V2.3 · 변경 시 자동 저장';
+      let message='V2.3.1 · 변경 시 자동 저장';
       try {
         const saved=localStorage.getItem(STORAGE_KEY),legacy=saved===null?localStorage.getItem(OLD_STORAGE_KEY):null;
-        if(saved!==null || legacy!==null){appData=normalizeData(JSON.parse(saved!==null?saved:legacy));message=saved!==null?'V2.3 저장 데이터 불러옴':'V1.8 데이터를 복사해 읽었어요 · 원본 유지';}
+        if(saved!==null || legacy!==null){appData=normalizeData(JSON.parse(saved!==null?saved:legacy));message=saved!==null?'V2.3.1 저장 데이터 불러옴':'V1.8 데이터를 복사해 읽었어요 · 원본 유지';}
       } catch(e){message='저장 데이터 읽기 실패 · 원본 보호를 위해 저장을 막았어요';storageReadFailed=true;}
       document.getElementById('globalNotice').value=appData.globalNotice||'';
       document.getElementById('saveStatus').textContent=message;
@@ -533,7 +533,7 @@ body {background:#f8f8f8}
     const PRESERVED_TEAMS = [...TEAMS, 'NORM']; // 가져온 이전 인원 기록은 보관만 한다.
     const STORAGE_KEY = 'shift_master_cal_v19';
     const OLD_STORAGE_KEY = 'shift_master_cal_v8';
-    const LEGACY_LABELS = { OT1: '조간2교', OT2: '야간2교', EARLY_DAY_IN: '주간조출', EARLY_NIGHT_IN: '야간조출' };
+    const LEGACY_LABELS = { REG_MORN:'조간정기', REG_NIGHT:'야간정기', OT1: '조간2교', OT2: '야간2교', EARLY_DAY_IN: '주간조출', EARLY_NIGHT_IN: '야간조출' };
     function fmtH(n) { return String(Math.round(Number(n) * 10) / 10); }
     function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function dateKey(y,m,d) { return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
@@ -586,9 +586,9 @@ body {background:#f8f8f8}
       if (cls.includes('b-vac')) return 't-vac';
       if (cls.includes('b-gong')) return 't-gong';
       if (cls.includes('b-ot')) return 't-ot';
-      if (txt==='조간') return 't-morn';
-      if (txt==='주간') return 't-day';
-      if (txt==='야간') return 't-night';
+      if (txt==='조간' || txt==='조간조퇴') return 't-morn';
+      if (txt==='주간' || txt==='주간조퇴') return 't-day';
+      if (txt==='야간' || txt==='야간조퇴') return 't-night';
       return 't-base';
     }
     // 계획 편성은 결원/기준근무만 반영한다. 개인 조출·잔업·조퇴는 여기서 제외한다.
@@ -635,7 +635,9 @@ body {background:#f8f8f8}
       TEAMS.forEach(t=>{
         const s=plan[t],r=s.record;
         if (!r.event && r.legacy) {
-          if(r.legacy==='OT1')Object.assign(s,{txt:'조간2교',plannedStart:origin+390,plannedEnd:origin+1110});
+          if(r.legacy==='REG_MORN')Object.assign(s,{txt:'조간정기',plannedStart:origin+390,plannedEnd:origin+1110});
+          else if(r.legacy==='REG_NIGHT')Object.assign(s,{txt:'야간정기',plannedStart:origin+1110,plannedEnd:origin+1830});
+          else if(r.legacy==='OT1')Object.assign(s,{txt:'조간2교',plannedStart:origin+390,plannedEnd:origin+1110});
           else if(r.legacy==='OT2')Object.assign(s,{txt:'야간2교',plannedStart:origin+1110,plannedEnd:origin+1830});
           else {s.txt=LEGACY_LABELS[r.legacy];s.plannedStart=origin+(r.legacy==='EARLY_DAY_IN'?630:1110);s.plannedEnd=s.plannedStart+720;}
           Object.assign(s,{plannedHours:12,cls:'b-ot',code:'LEGACY'});
@@ -678,6 +680,7 @@ body {background:#f8f8f8}
         s.netH=absent||s.role===4?0:s.hrs-8;
         if((s.autoInH||r.inH) && !absent && hasWork)s.cls='b-ot';
         if(inH>0 && !absent && hasWork && s.code==='BASE')s.txt=NAMES[s.role]+'조출';
+        else if(out>0 && !absent && hasWork && s.code==='BASE')s.txt=NAMES[s.role]+'조퇴';
         if(absent && (r.inH||r.otH||r.outH))s.issues.push('보관된 개인 시간조정은 휴가·공가 중에는 계산하지 않아요.');
       });
       return curr;
@@ -833,13 +836,13 @@ body {background:#f8f8f8}
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('monthGrid')){e.preventDefault();closeMonthGrid();}});
 
     const FORCE_LIST=[[1,'◓ 강제 지정: 조간'],[2,'◈ 강제 지정: 주간'],[3,'☾ 강제 지정: 야간'],[4,'⌂ 강제 지정: 휴무']];
-    const MANUAL_LIST=[['OT1','ϟ 수동 조간대근'],['OT2','ϟ 수동 야간대근'],['EARLY_DAY_IN','ϟ 수동 주간조기출근'],['EARLY_NIGHT_IN','ϟ 수동 야간조기출근']];
+    const MANUAL_LIST=[['REG_MORN','ϟ 수동 조간정기'],['REG_NIGHT','ϟ 수동 야간정기'],['OT1','ϟ 수동 조간대근'],['OT2','ϟ 수동 야간대근'],['EARLY_DAY_IN','ϟ 수동 주간조기출근'],['EARLY_NIGHT_IN','ϟ 수동 야간조기출근']];
     function popupReasons(s) {
       const r=s.record;
       if(r.event==='VAC'||r.event==='GONGGA')return [];
       const parts=[],hasWork=s.plannedHours>0;
       const plannedExtra=Math.max(0,s.plannedHours-(s.role===4||s.offOvertime?0:8));
-      if(plannedExtra>0)parts.push({h:plannedExtra,label:r.legacy&&r.legacy.startsWith('EARLY_')?'조출':'대근',negative:false});
+      if(plannedExtra>0)parts.push({h:plannedExtra,label:r.legacy&&r.legacy.startsWith('REG_')?'잔업':r.legacy&&r.legacy.startsWith('EARLY_')?'조출':'대근',negative:false});
       const inH=hasWork?Math.max(r.inH,s.autoInH||0):0;
       if(inH>0){const existing=parts.find(p=>p.label==='조출');if(existing)existing.h+=inH;else parts.push({h:inH,label:'조출',negative:false});}
       if(r.otH>0)parts.push({h:r.otH,label:'잔업',negative:false});
@@ -996,8 +999,8 @@ body {background:#f8f8f8}
     }
     function saveData() {
       if(storageReadFailed)return false;
-      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));const el=document.getElementById('saveStatus');el.textContent='V2.3 저장됨 · '+new Date().toLocaleTimeString();el.style.color='#10b981';return true;}
-      catch(e){const el=document.getElementById('saveStatus');el.textContent='V2.3 저장 실패';el.style.color='#ef4444';return false;}
+      try{localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));const el=document.getElementById('saveStatus');el.textContent='V2.3.1 저장됨 · '+new Date().toLocaleTimeString();el.style.color='#10b981';return true;}
+      catch(e){const el=document.getElementById('saveStatus');el.textContent='V2.3.1 저장 실패';el.style.color='#ef4444';return false;}
     }
     document.getElementById('modalBackdrop').addEventListener('click',function(e){if(e.target===this)closeModal();});
     document.addEventListener('keydown',function(e){
@@ -1012,7 +1015,7 @@ body {background:#f8f8f8}
     });
     init();
   </script>
-  <div class="app-version">V2.3</div>
+  <div class="app-version">V2.3.1</div>
 <style id="sync-layer-style">
 #syncGate { position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center; background: var(--bg); padding: 16px; box-sizing: border-box; }
 #syncGate.open { display: flex; }
